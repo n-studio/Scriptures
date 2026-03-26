@@ -1,0 +1,19 @@
+<div class="h-full overflow-y-auto px-4 md:px-8 py-8 md:py-12 max-w-5xl mx-auto w-full">
+  <div class="mb-12">
+    <h2 class="text-3xl font-serif mb-2">Browse Scriptures</h2>
+    <p class="text-stone-500 text-sm">Explore religious and historical texts across traditions.</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <% @traditions.each do |tradition| %>
+      <%= link_to tradition_path(tradition), class: "p-6 border border-stone-200 dark:border-stone-800 rounded-2xl hover:border-blue-500 transition-colors group" do %>
+        <h3 class="font-bold text-lg mb-2 group-hover:text-blue-500 transition-colors"><%= tradition.name %></h3>
+        <p class="text-sm text-stone-500 mb-4 line-clamp-2"><%= tradition.description %></p>
+        <div class="flex items-center gap-2 text-[10px] font-bold text-stone-400 uppercase tracking-widest">
+          <span><%= pluralize(tradition.corpora.size, "corpus", "corpora") %></span>
+          <%= arrow_right_icon %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

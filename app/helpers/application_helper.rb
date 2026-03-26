@@ -1,2 +1,94 @@
 module ApplicationHelper
+  def sidebar_link(label, icon, path, active: false)
+    base = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group"
+    active_class = "bg-stone-100 dark:bg-stone-900 text-stone-900 dark:text-stone-100"
+    inactive_class = "text-stone-500 hover:bg-stone-50 dark:hover:bg-stone-900/50 hover:text-stone-900 dark:hover:text-stone-100"
+    icon_active = "text-blue-500"
+    icon_inactive = "group-hover:text-stone-900 dark:group-hover:text-stone-100"
+
+    link_to path, class: "#{base} #{active ? active_class : inactive_class}", data: { turbo_action: "advance" } do
+      content_tag(:span, icon.html_safe, class: "shrink-0 transition-colors #{active ? icon_active : icon_inactive}") +
+        content_tag(:span, label, class: "text-sm font-medium whitespace-nowrap", data: { sidebar_target: "label" })
+    end
+  end
+
+  # Lucide-style SVG icons (20x20, stroke-width 2)
+  def reading_icon
+    svg_icon('<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>')
+  end
+
+  def browse_icon
+    svg_icon('<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>')
+  end
+
+  def search_icon
+    svg_icon('<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>')
+  end
+
+  def search_icon_sm
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>'.html_safe
+  end
+
+  def menu_icon
+    svg_icon('<line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>')
+  end
+
+  def sun_icon
+    svg_icon('<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>')
+  end
+
+  def moon_icon
+    svg_icon('<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>')
+  end
+
+  def chevron_right_icon(size: 12)
+    %(<svg xmlns="http://www.w3.org/2000/svg" width="#{size}" height="#{size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="m9 18 6-6-6-6"/></svg>).html_safe
+  end
+
+  def info_icon(size: 16)
+    %(<svg xmlns="http://www.w3.org/2000/svg" width="#{size}" height="#{size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>).html_safe
+  end
+
+  def bookmark_icon(size: 16)
+    %(<svg xmlns="http://www.w3.org/2000/svg" width="#{size}" height="#{size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>).html_safe
+  end
+
+  def arrow_right_icon(size: 10)
+    %(<svg xmlns="http://www.w3.org/2000/svg" width="#{size}" height="#{size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>).html_safe
+  end
+
+  def x_icon(size: 14)
+    %(<svg xmlns="http://www.w3.org/2000/svg" width="#{size}" height="#{size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-stone-400"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>).html_safe
+  end
+
+  # Map source document colors to Tailwind classes (avoids dynamic class interpolation)
+  SOURCE_BG_CLASSES = {
+    "blue" => "bg-blue-500",
+    "amber" => "bg-amber-500",
+    "emerald" => "bg-emerald-500",
+    "red" => "bg-red-500",
+    "purple" => "bg-purple-500"
+  }.freeze
+
+  SOURCE_TEXT_CLASSES = {
+    "blue" => "text-blue-600/80 dark:text-blue-400/80",
+    "amber" => "text-amber-600/80 dark:text-amber-400/80",
+    "emerald" => "text-emerald-600/80 dark:text-emerald-400/80",
+    "red" => "text-red-600/80 dark:text-red-400/80",
+    "purple" => "text-purple-600/80 dark:text-purple-400/80"
+  }.freeze
+
+  def source_bg_class(color)
+    SOURCE_BG_CLASSES[color] || "bg-stone-500"
+  end
+
+  def source_text_class(color)
+    SOURCE_TEXT_CLASSES[color] || "text-stone-600/80 dark:text-stone-400/80"
+  end
+
+  private
+
+  def svg_icon(paths)
+    %(<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">#{paths}</svg>).html_safe
+  end
 end

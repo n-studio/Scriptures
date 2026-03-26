@@ -1,0 +1,96 @@
+<div class="flex h-full overflow-hidden relative" data-controller="commentary">
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <%# Breadcrumb %>
+    <div class="px-4 md:px-8 py-4 flex items-center justify-between border-b border-stone-200 dark:border-stone-800">
+      <div class="flex items-center gap-2 text-xs font-medium text-stone-500 uppercase tracking-widest overflow-x-auto whitespace-nowrap">
+        <%= link_to @tradition.name, tradition_path(@tradition), class: "hover:text-stone-900 dark:hover:text-stone-100 transition-colors" %>
+        <%= chevron_right_icon %>
+        <%= link_to @corpus.name, tradition_corpora_path(@tradition, @corpus.slug), class: "hover:text-stone-900 dark:hover:text-stone-100 transition-colors" %>
+        <%= chevron_right_icon %>
+        <span class="text-stone-900 dark:text-stone-100"><%= @scripture.name %> <%= @division.number %></span>
+      </div>
+      <button data-action="commentary#toggle"
+              class="md:hidden p-2 text-stone-500 hover:text-stone-900 dark:hover:text-stone-100">
+        <%= info_icon %>
+      </button>
+    </div>
+
+    <%# Content %>
+    <div class="flex-1 overflow-y-auto px-4 md:px-8 py-8 md:py-12 max-w-4xl mx-auto w-full">
+      <div class="space-y-8 md:space-y-12">
+        <% @passages.each do |passage| %>
+          <div class="group relative" data-controller="word-tooltip">
+            <div class="flex flex-col md:flex-row gap-2 md:gap-6">
+              <span class="text-xs font-mono text-stone-400 mt-2 w-4 shrink-0"><%= passage.number %></span>
+              <div class="space-y-4 flex-1">
+                <%# Primary text (Hebrew) with source criticism coloring %>
+                <% primary_text = passage.text_for(@primary_translation) %>
+                <% if primary_text %>
+                  <% source = passage.source_documents.first %>
+                  <% source_color = source_text_class(source&.color) %>
+                  <% is_rtl = @primary_translation.language == "Hebrew" %>
+                  <p class="scripture-text text-2xl md:text-3xl <%= source_color %> <%= 'rtl text-right' if is_rtl %>">
+                    <% primary_text.split(/\s+/).each_with_index do |word, i| %>
+                      <span class="hover:bg-stone-200 dark:hover:bg-stone-800 px-1 rounded cursor-help transition-colors inline-block"
+                            data-action="mouseenter->word-tooltip#show mouseleave->word-tooltip#hide"
+                            data-word="<%= word %>"><%= word %> </span>
+                    <% end %>
+                  </p>
+                <% end %>
+
+                <%# Secondary text (KJV English) %>
+                <% secondary_text = passage.text_for(@secondary_translation) %>
+                <% if secondary_text %>
+                  <p class="scripture-text text-base md:text-lg text-stone-600 dark:text-stone-400 ltr">
+                    <%= secondary_text %>
+                  </p>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Source Criticism Legend %>
+    <% if @source_documents.any? %>
+      <div class="px-4 md:px-8 py-3 border-t border-stone-200 dark:border-stone-800 flex flex-wrap items-center gap-4 md:gap-6 text-[10px] font-bold uppercase tracking-widest text-stone-500 overflow-x-auto">
+        <% @source_documents.each do |sd| %>
+          <div class="flex items-center gap-2 shrink-0">
+            <div class="w-3 h-3 <%= source_bg_class(sd.color) %> rounded-sm"></div>
+            <span><%= sd.name %> (<%= sd.abbreviation %>)</span>
+          </div>
+        <% end %>
+        <div class="ml-auto flex items-center gap-4 shrink-0">
+          <span class="hover:text-stone-900 dark:hover:text-stone-100 transition-colors cursor-pointer">Source Criticism</span>
+          <span class="hover:text-stone-900 dark:hover:text-stone-100 transition-colors cursor-pointer">Interlinear</span>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Right Sidebar - Commentary %>
+  <div data-commentary-target="panel"
+       class="flex absolute md:relative right-0 top-0 h-full z-40 w-80 border-l border-stone-200 dark:border-stone-800 flex-col bg-white/80 dark:bg-stone-950/80 backdrop-blur-xl">
+    <div class="p-4 border-b border-stone-200 dark:border-stone-800 flex justify-between items-center">
+      <h3 class="text-xs font-bold uppercase tracking-widest">Commentary</h3>
+      <button data-action="commentary#toggle" class="md:hidden p-1">
+        <%= x_icon %>
+      </button>
+    </div>
+    <div class="p-6 overflow-y-auto space-y-6">
+      <div class="space-y-2">
+        <div class="flex items-center gap-2">
+          <span class="text-[10px] font-bold text-stone-400"><%= @scripture.name.upcase %> <%= @division.number %>:1</span>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">Redaction</span>
+        </div>
+        <p class="text-sm leading-relaxed text-stone-600 dark:text-stone-400">
+          The opening phrase <span class="italic font-serif">bereshit</span> is grammatically ambiguous. Scholars debate whether it represents an absolute beginning or a temporal clause ("When God began to create...").
+        </p>
+      </div>
+      <div class="pt-4 border-t border-stone-100 dark:border-stone-900">
+        <p class="text-[10px] text-stone-400 italic">Source: Speiser, E.A. (1964). Genesis (Anchor Bible).</p>
+      </div>
+    </div>
+  </div>
+</div>

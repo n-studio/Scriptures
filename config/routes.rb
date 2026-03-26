@@ -1,14 +1,18 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
+  # Browse traditions and corpora
+  resources :traditions, only: [ :index, :show ] do
+    resources :corpora, only: [ :show ], param: :slug
+  end
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  # Search
+  get "search", to: "search#index", as: :search
+
+  # Canonical passage URLs: /bible/genesis/1
+  get ":corpus_slug/:scripture_slug/:division_number", to: "passages#show", as: :reading
+
+  # Root: show the default reading view (Genesis 1)
+  root "passages#show"
 end

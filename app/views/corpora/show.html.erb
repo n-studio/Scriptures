@@ -1,0 +1,36 @@
+<div class="h-full overflow-y-auto px-4 md:px-8 py-8 md:py-12 max-w-5xl mx-auto w-full">
+  <%# Breadcrumb %>
+  <div class="flex items-center gap-2 text-xs font-medium text-stone-500 uppercase tracking-widest mb-8">
+    <%= link_to "Browse", traditions_path, class: "hover:text-stone-900 dark:hover:text-stone-100 transition-colors" %>
+    <%= chevron_right_icon %>
+    <%= link_to @tradition.name, tradition_path(@tradition), class: "hover:text-stone-900 dark:hover:text-stone-100 transition-colors" %>
+    <%= chevron_right_icon %>
+    <span class="text-stone-900 dark:text-stone-100"><%= @corpus.name %></span>
+  </div>
+
+  <div class="mb-12">
+    <h2 class="text-3xl font-serif mb-2"><%= @corpus.name %></h2>
+    <p class="text-stone-500 text-sm"><%= @corpus.description %></p>
+  </div>
+
+  <div class="space-y-4">
+    <% @scriptures.each do |scripture| %>
+      <div class="p-6 border border-stone-200 dark:border-stone-800 rounded-2xl hover:border-blue-500 transition-colors group">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="font-bold text-lg mb-1 group-hover:text-blue-500 transition-colors"><%= scripture.name %></h3>
+            <p class="text-sm text-stone-500 line-clamp-1"><%= scripture.description %></p>
+          </div>
+          <div class="flex items-center gap-3">
+            <% scripture.divisions.each do |division| %>
+              <%= link_to reading_path(corpus_slug: @corpus.slug, scripture_slug: scripture.slug, division_number: division.number),
+                    class: "w-10 h-10 rounded-lg bg-stone-100 dark:bg-stone-900 hover:bg-blue-500 hover:text-white flex items-center justify-center text-sm font-bold transition-colors" do %>
+                <%= division.number %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
