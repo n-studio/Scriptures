@@ -86,6 +86,37 @@ module ApplicationHelper
     SOURCE_TEXT_CLASSES[color] || "text-stone-600/80 dark:text-stone-400/80"
   end
 
+  def toggle_translation_params(translation)
+    current = Array(params[:t])
+    if current.include?(translation.abbreviation)
+      remaining = current - [ translation.abbreviation ]
+      remaining.empty? ? nil : remaining
+    else
+      current + [ translation.abbreviation ]
+    end
+  end
+
+  def chevron_left_icon(size: 12)
+    %(<svg xmlns="http://www.w3.org/2000/svg" width="#{size}" height="#{size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="m15 18-6-6 6-6"/></svg>).html_safe
+  end
+
+  def translation_diff(text_a, text_b)
+    return [] if text_a.blank? || text_b.blank?
+
+    words_a = text_a.split(/\s+/)
+    words_b = text_b.split(/\s+/)
+    sdiff = Diff::LCS.sdiff(words_a, words_b)
+
+    sdiff.map do |change|
+      case change.action
+      when "=" then { type: :equal, text: change.old_element }
+      when "-" then { type: :deletion, text: change.old_element }
+      when "+" then { type: :addition, text: change.new_element }
+      when "!" then { type: :change, old_text: change.old_element, new_text: change.new_element }
+      end
+    end
+  end
+
   private
 
   def svg_icon(paths)

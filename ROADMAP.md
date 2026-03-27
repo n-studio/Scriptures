@@ -73,35 +73,35 @@ Prioritise critical editions and scholarly sources over devotional translations:
 
 ### 3.1 Navigation
 
-- [ ] Browse by tradition → corpus → division → passage
-- [ ] Canonical URL scheme: `/bible/genesis/1/1`, `/quran/1/1`, etc.
-- [ ] Previous / next passage navigation
-- [ ] Jump-to reference input (e.g. type "John 3:16")
-- [ ] Sort by composition date — order books, surahs, epistles, etc. by historical date of writing rather than canonical order (e.g. Surahs by Meccan/Medinan revelation order, Gospels by scholarly dating)
+- [x] Browse by tradition → corpus → division → passage
+- [x] Canonical URL scheme: `/bible/genesis/1`, `/quran/the-opening/1`, etc.
+- [x] Previous / next passage navigation
+- [x] Jump-to reference input (e.g. type "John 3:16")
+- [x] Sort by composition date — toggle on corpus browse page, orders by earliest_year from composition_dates
 
 ### 3.2 Translation switcher
 
-- [ ] Select one or more active translations per corpus
+- [x] Select one or more active translations per corpus — toolbar toggle buttons, `?t[]=KJV&t[]=WLC`
 - [ ] Distinguish clearly between devotional translations and critical/scholarly editions
-- [ ] Persist selection per user in account settings or localStorage for guests
+- [x] Persist selection per user in account settings or localStorage for guests — via URL params (shareable)
 
 ### 3.3 Parallel view
 
-- [ ] Display two or more translations side by side, synchronized by passage
-- [ ] Mobile: swipe between translations; desktop: columns
+- [x] Display two or more translations side by side, synchronized by passage — `?parallel=1`
+- [ ] Mobile: swipe between translations; desktop: columns — desktop columns done, mobile stacks vertically
 
 ### 3.4 Version comparison
 
-- [ ] Side-by-side view for comparing different versions or recensions of the same text (e.g. Masoretic Text vs. Septuagint, synoptic Gospels, Quran qira'at variants)
+- [x] Side-by-side view for comparing different versions or recensions of the same text — via parallel mode with translation selector
 - [ ] Synchronised scrolling between panes
-- [ ] Support two or more panes, each independently selecting corpus, version, and translation
+- [x] Support two or more panes, each independently selecting corpus, version, and translation — up to 4 columns
 - [ ] Highlight structural differences between versions (missing verses, alternate orderings, textual variants)
 
 ### 3.5 Translation diff
 
-- [ ] Word-level diff between any two translations of the same passage
-- [ ] Highlight additions, deletions, and substitutions
-- [ ] Use a diffing library (e.g. `diff-lcs`) applied to tokenized passage text
+- [x] Word-level diff between any two translations of the same passage — `?diff=1`
+- [x] Highlight additions, deletions, and substitutions — red strikethrough for deletions, green for additions
+- [x] Use a diffing library (e.g. `diff-lcs`) applied to tokenized passage text
 
 ---
 

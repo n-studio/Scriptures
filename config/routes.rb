@@ -20,8 +20,9 @@ Rails.application.routes.draw do
     resources :corpora, only: [ :show ], param: :slug
   end
 
-  # Search
+  # Search & jump-to-reference
   get "search", to: "search#index", as: :search
+  get "jump", to: "passages#jump", as: :jump
 
   # Canonical passage URLs: /bible/genesis/1
   get ":corpus_slug/:scripture_slug/:division_number", to: "passages#show", as: :reading

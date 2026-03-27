@@ -8,9 +8,17 @@
     <span class="text-stone-900 dark:text-stone-100"><%= @corpus.name %></span>
   </div>
 
-  <div class="mb-12">
+  <div class="mb-8">
     <h2 class="text-3xl font-serif mb-2"><%= @corpus.name %></h2>
     <p class="text-stone-500 text-sm"><%= @corpus.description %></p>
+  </div>
+
+  <div class="flex items-center gap-3 mb-6 text-xs font-medium">
+    <span class="text-stone-400 uppercase tracking-widest">Sort:</span>
+    <%= link_to "Canonical", tradition_corpora_path(@tradition, @corpus.slug),
+          class: "px-2 py-1 rounded-md transition-colors #{@sort != 'date' ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900' : 'text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-900'}" %>
+    <%= link_to "Composition date", tradition_corpora_path(@tradition, @corpus.slug, sort: "date"),
+          class: "px-2 py-1 rounded-md transition-colors #{@sort == 'date' ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900' : 'text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-900'}" %>
   </div>
 
   <div class="space-y-4">
@@ -20,6 +28,9 @@
           <div>
             <h3 class="font-bold text-lg mb-1 group-hover:text-blue-500 transition-colors"><%= scripture.name %></h3>
             <p class="text-sm text-stone-500 line-clamp-1"><%= scripture.description %></p>
+            <% if (cd = scripture.composition_dates.first) %>
+              <p class="text-xs text-stone-400 mt-1"><%= cd.description.truncate(80) %></p>
+            <% end %>
           </div>
           <div class="flex items-center gap-3">
             <% scripture.divisions.each do |division| %>
