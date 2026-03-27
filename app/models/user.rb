@@ -3,6 +3,11 @@ class User < ApplicationRecord
   has_many :sessions, dependent: :destroy
   has_many :magic_tokens, dependent: :destroy
   has_many :passkey_credentials, dependent: :destroy
+  has_many :bookmarks, dependent: :destroy
+  has_many :highlights, dependent: :destroy
+  has_many :annotations, dependent: :destroy
+  has_many :tags, dependent: :destroy
+  has_many :collections, dependent: :destroy
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 

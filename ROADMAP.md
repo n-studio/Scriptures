@@ -109,26 +109,26 @@ Prioritise critical editions and scholarly sources over devotional translations:
 
 ### 4.1 Bookmarks
 
-- [ ] One-click bookmark any passage
-- [ ] List view of all bookmarks, sortable and filterable
+- [x] One-click bookmark any passage — toggle button on hover in reading view
+- [x] List view of all bookmarks, sortable and filterable — `/bookmarks`
 
 ### 4.2 Highlights
 
-- [ ] Select any span of text within a passage and apply a colour
-- [ ] Six predefined colours, user-labelled
-- [ ] Highlights persist per user per passage translation
+- [x] Select any span of text within a passage and apply a colour — Highlight model with start/end offsets
+- [x] Six predefined colours, user-labelled — yellow, blue, green, pink, purple, orange
+- [x] Highlights persist per user per passage translation
 
 ### 4.3 Annotations
 
-- [ ] Attach a rich-text note (via Lexxy) to any passage or span
-- [ ] Tags: user-defined, autocompleted
-- [ ] List and search all annotations
+- [x] Attach a rich-text note to any passage — inline form via Stimulus, displayed under passage
+- [x] Tags: user-defined, autocompleted — comma-separated tag_list with auto-creation
+- [x] List and search all annotations — `/annotations` with full-text search and tag filter
 
 ### 4.4 Collections
 
-- [ ] Create named collections of passages (e.g. "Flood narratives across traditions")
-- [ ] Add passages to collections from the reading view
-- [ ] Share collections publicly or keep private
+- [x] Create named collections of passages (e.g. "Flood narratives across traditions")
+- [x] Add passages to collections from the reading view — dropdown menu on passage hover
+- [x] Share collections publicly or keep private — `public` boolean, public collections viewable without auth
 
 ---
 

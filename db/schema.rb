@@ -10,7 +10,59 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_27_151134) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_27_203452) do
+  create_table "annotation_tags", force: :cascade do |t|
+    t.integer "annotation_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "tag_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["annotation_id", "tag_id"], name: "index_annotation_tags_on_annotation_id_and_tag_id", unique: true
+    t.index ["annotation_id"], name: "index_annotation_tags_on_annotation_id"
+    t.index ["tag_id"], name: "index_annotation_tags_on_tag_id"
+  end
+
+  create_table "annotations", force: :cascade do |t|
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.integer "passage_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["passage_id"], name: "index_annotations_on_passage_id"
+    t.index ["user_id", "passage_id"], name: "index_annotations_on_user_id_and_passage_id"
+    t.index ["user_id"], name: "index_annotations_on_user_id"
+  end
+
+  create_table "bookmarks", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "passage_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["passage_id"], name: "index_bookmarks_on_passage_id"
+    t.index ["user_id", "passage_id"], name: "index_bookmarks_on_user_id_and_passage_id", unique: true
+    t.index ["user_id"], name: "index_bookmarks_on_user_id"
+  end
+
+  create_table "collection_passages", force: :cascade do |t|
+    t.integer "collection_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "passage_id", null: false
+    t.integer "position"
+    t.datetime "updated_at", null: false
+    t.index ["collection_id", "passage_id"], name: "index_collection_passages_on_collection_id_and_passage_id", unique: true
+    t.index ["collection_id"], name: "index_collection_passages_on_collection_id"
+    t.index ["passage_id"], name: "index_collection_passages_on_passage_id"
+  end
+
+  create_table "collections", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.boolean "public", default: false, null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["user_id"], name: "index_collections_on_user_id"
+  end
+
   create_table "composition_dates", force: :cascade do |t|
     t.text "citation"
     t.string "confidence"
@@ -44,6 +96,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_151134) do
     t.datetime "updated_at", null: false
     t.index ["parent_id"], name: "index_divisions_on_parent_id"
     t.index ["scripture_id"], name: "index_divisions_on_scripture_id"
+  end
+
+  create_table "highlights", force: :cascade do |t|
+    t.string "color", null: false
+    t.datetime "created_at", null: false
+    t.integer "end_offset", null: false
+    t.string "label"
+    t.integer "passage_id", null: false
+    t.integer "start_offset", null: false
+    t.integer "translation_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["passage_id"], name: "index_highlights_on_passage_id"
+    t.index ["translation_id"], name: "index_highlights_on_translation_id"
+    t.index ["user_id"], name: "index_highlights_on_user_id"
   end
 
   create_table "lexicon_entries", force: :cascade do |t|
@@ -183,6 +250,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_151134) do
     t.index ["corpus_id"], name: "index_source_documents_on_corpus_id"
   end
 
+  create_table "tags", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["user_id", "name"], name: "index_tags_on_user_id_and_name", unique: true
+    t.index ["user_id"], name: "index_tags_on_user_id"
+  end
+
   create_table "textual_variants", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "manuscript_id", null: false
@@ -228,10 +304,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_151134) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "annotation_tags", "annotations"
+  add_foreign_key "annotation_tags", "tags"
+  add_foreign_key "annotations", "passages"
+  add_foreign_key "annotations", "users"
+  add_foreign_key "bookmarks", "passages"
+  add_foreign_key "bookmarks", "users"
+  add_foreign_key "collection_passages", "collections"
+  add_foreign_key "collection_passages", "passages"
+  add_foreign_key "collections", "users"
   add_foreign_key "composition_dates", "scriptures"
   add_foreign_key "corpora", "traditions"
   add_foreign_key "divisions", "divisions", column: "parent_id"
   add_foreign_key "divisions", "scriptures"
+  add_foreign_key "highlights", "passages"
+  add_foreign_key "highlights", "translations"
+  add_foreign_key "highlights", "users"
   add_foreign_key "magic_tokens", "users"
   add_foreign_key "manuscripts", "corpora", column: "corpus_id"
   add_foreign_key "original_language_tokens", "lexicon_entries"
@@ -247,6 +335,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_151134) do
   add_foreign_key "scriptures", "corpora", column: "corpus_id"
   add_foreign_key "sessions", "users"
   add_foreign_key "source_documents", "corpora", column: "corpus_id"
+  add_foreign_key "tags", "users"
   add_foreign_key "textual_variants", "manuscripts"
   add_foreign_key "textual_variants", "passages"
   add_foreign_key "translations", "corpora", column: "corpus_id"

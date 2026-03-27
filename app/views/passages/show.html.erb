@@ -149,7 +149,7 @@
         <%# === STANDARD VIEW === %>
         <div class="space-y-8 md:space-y-12">
           <% @passages.each do |passage| %>
-            <div class="group relative" data-controller="word-tooltip">
+            <div class="group relative" data-controller="word-tooltip passage-actions">
               <div class="flex flex-col md:flex-row gap-2 md:gap-6">
                 <span class="text-xs font-mono text-stone-400 mt-2 w-4 shrink-0"><%= passage.number %></span>
                 <div class="space-y-4 flex-1">
@@ -172,6 +172,57 @@
                       <p class="scripture-text text-base md:text-lg text-stone-600 dark:text-stone-400 <%= 'rtl text-right' if is_rtl %>">
                         <%= text %>
                       </p>
+                    <% end %>
+                  <% end %>
+                  <%# Passage action buttons (bookmark, annotate, collect) %>
+                  <% if authenticated? %>
+                    <div class="flex items-center gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <% if @bookmarked_ids.include?(passage.id) %>
+                        <%= button_to bookmark_path(current_user.bookmarks.find_by(passage: passage)), method: :delete, class: "text-xs text-amber-500 hover:text-amber-600 transition-colors", title: "Remove bookmark" do %>
+                          <%= bookmark_icon(size: 14) %>
+                        <% end %>
+                      <% else %>
+                        <%= button_to bookmarks_path(passage_id: passage.id), class: "text-xs text-stone-400 hover:text-amber-500 transition-colors", title: "Bookmark" do %>
+                          <%= bookmark_icon(size: 14) %>
+                        <% end %>
+                      <% end %>
+
+                      <button data-action="click->passage-actions#toggleAnnotation"
+                              data-passage-id="<%= passage.id %>"
+                              class="text-xs text-stone-400 hover:text-blue-500 transition-colors" title="Annotate">
+                        <%= annotation_icon(size: 14) %>
+                      </button>
+
+                      <% if @user_collections.any? %>
+                        <details class="relative">
+                          <summary class="text-xs text-stone-400 hover:text-green-500 transition-colors cursor-pointer list-none" title="Add to collection">
+                            <%= collection_icon(size: 14) %>
+                          </summary>
+                          <div class="absolute left-0 top-6 z-10 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg shadow-lg py-1 min-w-40">
+                            <% @user_collections.each do |col| %>
+                              <%= button_to add_passage_collection_path(col, passage_id: passage.id), class: "w-full text-left px-3 py-1.5 text-xs hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors" do %>
+                                <%= col.name %>
+                              <% end %>
+                            <% end %>
+                          </div>
+                        </details>
+                      <% end %>
+                    </div>
+                  <% end %>
+
+                  <%# Inline annotations %>
+                  <% if (annotations = @user_annotations[passage.id]) %>
+                    <% annotations.each do |ann| %>
+                      <div class="mt-2 pl-3 border-l-2 border-blue-300 dark:border-blue-700">
+                        <p class="text-xs text-stone-600 dark:text-stone-400"><%= ann.body %></p>
+                        <% if ann.tags.any? %>
+                          <div class="flex gap-1 mt-1">
+                            <% ann.tags.each do |tag| %>
+                              <span class="px-1.5 py-0.5 rounded text-[9px] font-medium bg-stone-100 dark:bg-stone-800 text-stone-500"><%= tag.name %></span>
+                            <% end %>
+                          </div>
+                        <% end %>
+                      </div>
                     <% end %>
                   <% end %>
                 </div>

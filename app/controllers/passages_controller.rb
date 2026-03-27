@@ -25,6 +25,18 @@ class PassagesController < ApplicationController
     @prev_division = current_index&.positive? ? all_divisions[current_index - 1] : nil
     @next_division = current_index && current_index < all_divisions.size - 1 ? all_divisions[current_index + 1] : nil
 
+    # User organization data
+    if current_user
+      passage_ids = @passages.map(&:id)
+      @bookmarked_ids = current_user.bookmarks.where(passage_id: passage_ids).pluck(:passage_id).to_set
+      @user_annotations = current_user.annotations.where(passage_id: passage_ids).group_by(&:passage_id)
+      @user_collections = current_user.collections
+    else
+      @bookmarked_ids = Set.new
+      @user_annotations = {}
+      @user_collections = Collection.none
+    end
+
     # For parallel view
     @parallel = params[:parallel].present?
 

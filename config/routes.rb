@@ -20,6 +20,17 @@ Rails.application.routes.draw do
     resources :corpora, only: [ :show ], param: :slug
   end
 
+  # Organization
+  resources :bookmarks, only: %i[index create destroy]
+  resources :highlights, only: %i[create destroy]
+  resources :annotations, only: %i[index create update destroy]
+  resources :collections, only: %i[index show create update destroy] do
+    member do
+      post :add_passage
+      delete :remove_passage
+    end
+  end
+
   # Search & jump-to-reference
   get "search", to: "search#index", as: :search
   get "jump", to: "passages#jump", as: :jump

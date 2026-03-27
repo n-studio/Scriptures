@@ -43,6 +43,12 @@
           <%= sidebar_link "Reading", reading_icon, root_path, active: current_page?(root_path) || controller_name == "passages" %>
           <%= sidebar_link "Browse", browse_icon, traditions_path, active: controller_name.in?(%w[traditions corpora scriptures divisions]) %>
           <%= sidebar_link "Search", search_icon, search_path, active: controller_name == "search" %>
+          <% if authenticated? %>
+            <div class="mt-4 mb-1 px-3"><div class="border-t border-stone-100 dark:border-stone-900"></div></div>
+            <%= sidebar_link "Bookmarks", bookmark_icon(size: 20), bookmarks_path, active: controller_name == "bookmarks" %>
+            <%= sidebar_link "Annotations", annotation_icon, annotations_path(user_id: current_user), active: controller_name == "annotations" %>
+            <%= sidebar_link "Collections", collection_icon, collections_path, active: controller_name == "collections" %>
+          <% end %>
         </nav>
 
         <div class="p-4 border-t border-stone-100 dark:border-stone-900 space-y-2">
