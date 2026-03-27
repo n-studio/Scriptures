@@ -4,7 +4,7 @@ A scripture study tool for atheist religion scholars — compare translations, a
 
 ## Stack
 
-- Ruby 4 / Rails 8.1 (SQLite3, Propshaft, Importmap)
+- Ruby 4 / Rails 8.1 (PostgreSQL, Propshaft, Importmap)
 - Hotwire (Turbo + Stimulus)
 - Tailwind CSS
 - Solid Cache / Solid Queue / Solid Cable

@@ -127,7 +127,7 @@ The primary audience is atheist religion scholars: academics and researchers who
 ## Requirements
 
 - Ruby 4
-- SQLite3
+- PostgreSQL
 
 ## Setup
 
