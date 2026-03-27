@@ -82,20 +82,20 @@ Prioritise critical editions and scholarly sources over devotional translations:
 ### 3.2 Translation switcher
 
 - [x] Select one or more active translations per corpus — toolbar toggle buttons, `?t[]=KJV&t[]=WLC`
-- [ ] Distinguish clearly between devotional translations and critical/scholarly editions
+- [x] Distinguish clearly between devotional translations and critical/scholarly editions — `edition_type` field (critical/devotional/original) with colour-coded badges in toolbar
 - [x] Persist selection per user in account settings or localStorage for guests — via URL params (shareable)
 
 ### 3.3 Parallel view
 
 - [x] Display two or more translations side by side, synchronized by passage — `?parallel=1`
-- [ ] Mobile: swipe between translations; desktop: columns — desktop columns done, mobile stacks vertically
+- [x] Mobile: swipe between translations; desktop: columns — CSS snap scrolling with Stimulus swipe controller and dot indicators
 
 ### 3.4 Version comparison
 
 - [x] Side-by-side view for comparing different versions or recensions of the same text — via parallel mode with translation selector
-- [ ] Synchronised scrolling between panes
+- [x] Synchronised scrolling between panes — Stimulus sync-scroll controller
 - [x] Support two or more panes, each independently selecting corpus, version, and translation — up to 4 columns
-- [ ] Highlight structural differences between versions (missing verses, alternate orderings, textual variants)
+- [x] Highlight structural differences between versions (missing verses, alternate orderings, textual variants) — amber border for missing verses, purple "V" indicator for textual variants
 
 ### 3.5 Translation diff
 

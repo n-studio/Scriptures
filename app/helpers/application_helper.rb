@@ -96,6 +96,21 @@ module ApplicationHelper
     end
   end
 
+  EDITION_TYPE_BADGES = { "critical" => "C", "devotional" => "D", "original" => "O" }.freeze
+  EDITION_TYPE_COLORS = {
+    "critical" => "text-blue-500",
+    "devotional" => "text-amber-500",
+    "original" => "text-emerald-500"
+  }.freeze
+
+  def edition_type_badge(type)
+    EDITION_TYPE_BADGES[type]
+  end
+
+  def edition_type_color(type)
+    EDITION_TYPE_COLORS[type] || "text-stone-400"
+  end
+
   def chevron_left_icon(size: 12)
     %(<svg xmlns="http://www.w3.org/2000/svg" width="#{size}" height="#{size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="m15 18-6-6 6-6"/></svg>).html_safe
   end

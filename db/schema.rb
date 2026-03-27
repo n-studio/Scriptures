@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_27_101346) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_27_151134) do
   create_table "composition_dates", force: :cascade do |t|
     t.text "citation"
     t.string "confidence"
@@ -209,6 +209,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_101346) do
     t.integer "corpus_id", null: false
     t.datetime "created_at", null: false
     t.text "description"
+    t.string "edition_type"
     t.string "language"
     t.string "name"
     t.datetime "updated_at", null: false

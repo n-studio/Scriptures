@@ -211,4 +211,28 @@ namespace :import do
     Import::StrongsLexicon.new(file: sources.join("strongs_hebrew.js"), language: "Hebrew").run if sources.join("strongs_hebrew.js").exist?
     Import::StrongsLexicon.new(file: sources.join("strongs_greek.js"), language: "Greek").run if sources.join("strongs_greek.js").exist?
   end
+
+  desc "Classify translations by edition type (critical, devotional, original)"
+  task classify_translations: :environment do
+    classifications = {
+      # Original language texts
+      "WLC" => "original", "SBLGNT" => "original", "QAR" => "original", "PLI" => "original",
+      # Critical/scholarly editions and translations
+      "LXX" => "critical", "ASV" => "critical",
+      # Devotional translations
+      "KJV" => "devotional", "YLT" => "devotional", "DBY" => "devotional",
+      "SAH" => "devotional", "YAL" => "devotional", "PKT" => "devotional", "SUJ" => "devotional"
+    }
+
+    updated = 0
+    classifications.each do |abbr, type|
+      count = Translation.where(abbreviation: abbr, edition_type: nil).update_all(edition_type: type)
+      updated += count
+    end
+
+    # DSS scroll transcriptions are original texts
+    Translation.where(edition_type: nil).joins(:corpus).where(corpora: { slug: "dead-sea-scrolls" }).update_all(edition_type: "original")
+
+    puts "Classified #{updated} translations"
+  end
 end

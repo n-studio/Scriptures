@@ -113,18 +113,21 @@ end
 wlc = Translation.find_or_create_by!(abbreviation: "WLC", corpus: bible) do |t|
   t.name = "Westminster Leningrad Codex"
   t.language = "Hebrew"
+  t.edition_type = "original"
   t.description = "The Masoretic Text as represented in the Westminster Leningrad Codex, the oldest complete manuscript of the Hebrew Bible."
 end
 
 kjv = Translation.find_or_create_by!(abbreviation: "KJV", corpus: bible) do |t|
   t.name = "King James Version"
   t.language = "English"
+  t.edition_type = "devotional"
   t.description = "The 1611 Authorized Version, the most influential English translation. Public domain."
 end
 
 lxx = Translation.find_or_create_by!(abbreviation: "LXX", corpus: bible) do |t|
   t.name = "Septuagint"
   t.language = "Greek"
+  t.edition_type = "critical"
   t.description = "The ancient Greek translation of the Hebrew scriptures, produced in Alexandria c. 3rd-2nd century BCE."
 end
 

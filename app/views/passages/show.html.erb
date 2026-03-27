@@ -19,13 +19,21 @@
 
     <%# Toolbar: translation switcher, view modes, jump-to-reference %>
     <div class="px-4 md:px-8 py-2 border-b border-stone-200 dark:border-stone-800 flex flex-wrap items-center gap-2 md:gap-4 text-xs">
-      <%# Translation selector %>
-      <% @translations.each do |t| %>
-        <% selected = @selected_translations.include?(t) %>
-        <%= link_to reading_path(corpus_slug: @corpus.slug, scripture_slug: @scripture.slug, division_number: @division.number, t: toggle_translation_params(t), parallel: params[:parallel], diff: params[:diff]),
-              class: "px-2 py-1 rounded-md font-medium transition-colors #{selected ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900' : 'text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-900'}",
-              data: { turbo_action: "replace" } do %>
-          <%= t.abbreviation %>
+      <%# Translation selector grouped by edition type %>
+      <% grouped = @translations.group_by { |t| t.edition_type || "other" } %>
+      <% %w[original critical devotional other].each do |type| %>
+        <% next unless (group = grouped[type]) %>
+        <% group.each do |t| %>
+          <% selected = @selected_translations.include?(t) %>
+          <%= link_to reading_path(corpus_slug: @corpus.slug, scripture_slug: @scripture.slug, division_number: @division.number, t: toggle_translation_params(t), parallel: params[:parallel], diff: params[:diff]),
+                class: "px-2 py-1 rounded-md font-medium transition-colors #{selected ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900' : 'text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-900'}",
+                title: "#{t.name} (#{t.edition_type || 'unclassified'})",
+                data: { turbo_action: "replace" } do %>
+            <%= t.abbreviation %><% if t.edition_type %><span class="ml-0.5 text-[8px] align-super <%= edition_type_color(t.edition_type) %>"><%= edition_type_badge(t.edition_type) %></span><% end %>
+          <% end %>
+        <% end %>
+        <% if type != "other" && grouped.keys.last != type %>
+          <div class="h-4 w-px bg-stone-200 dark:bg-stone-800 mx-0.5 hidden md:block"></div>
         <% end %>
       <% end %>
 
@@ -93,20 +101,42 @@
 
       <% elsif @parallel %>
         <%# === PARALLEL VIEW === %>
+        <%# Mobile: swipe indicator %>
+        <div class="md:hidden flex items-center justify-center gap-1.5 mb-4" data-controller="parallel-swipe">
+          <% @selected_translations.each_with_index do |t, i| %>
+            <button data-parallel-swipe-target="indicator"
+                    data-action="click->parallel-swipe#goTo"
+                    data-parallel-swipe-index-param="<%= i %>"
+                    class="w-2 h-2 rounded-full transition-colors <%= i == 0 ? 'bg-stone-900 dark:bg-stone-100' : 'bg-stone-300 dark:bg-stone-700' %>"
+                    title="<%= t.abbreviation %>"></button>
+          <% end %>
+        </div>
+
         <div class="space-y-6">
           <% @passages.each do |passage| %>
-            <div class="flex gap-4">
-              <span class="text-xs font-mono text-stone-400 mt-1 w-4 shrink-0"><%= passage.number %></span>
-              <div class="flex-1 grid grid-cols-1 md:grid-cols-<%= [@selected_translations.size, 4].min %> gap-4">
-                <% @selected_translations.each do |t| %>
-                  <div>
+            <% texts = @selected_translations.map { |t| passage.text_for(t) } %>
+            <% has_missing = texts.any?(&:blank?) && texts.any?(&:present?) %>
+            <% has_variants = passage.textual_variants.any? %>
+            <div class="flex gap-4 <%= 'border-l-2 border-amber-400 pl-2' if has_missing %>" data-controller="parallel-swipe">
+              <div class="flex flex-col items-center gap-1">
+                <span class="text-xs font-mono text-stone-400 mt-1 w-4 shrink-0"><%= passage.number %></span>
+                <% if has_variants %>
+                  <span class="w-4 text-center text-[8px] text-purple-500" title="Textual variants exist">V</span>
+                <% end %>
+              </div>
+              <%# Mobile: horizontal scroll with snap; Desktop: grid columns %>
+              <div data-parallel-swipe-target="container"
+                   data-action="touchstart->parallel-swipe#touchstart touchmove->parallel-swipe#touchmove touchend->parallel-swipe#touchend"
+                   class="flex-1 flex md:grid md:grid-cols-<%= [@selected_translations.size, 4].min %> gap-4 overflow-x-auto md:overflow-x-visible snap-x snap-mandatory scroll-smooth"
+                   style="-webkit-overflow-scrolling: touch;">
+                <% @selected_translations.each_with_index do |t, i| %>
+                  <div class="min-w-full md:min-w-0 snap-start">
                     <div class="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1"><%= t.abbreviation %></div>
-                    <% text = passage.text_for(t) %>
-                    <% if text %>
+                    <% if texts[i].present? %>
                       <% is_rtl = t.language.in?(%w[Hebrew Arabic]) %>
-                      <p class="text-sm leading-relaxed text-stone-700 dark:text-stone-300 <%= 'rtl text-right' if is_rtl %>"><%= text %></p>
+                      <p class="text-sm leading-relaxed text-stone-700 dark:text-stone-300 <%= 'rtl text-right' if is_rtl %>"><%= texts[i] %></p>
                     <% else %>
-                      <p class="text-sm text-stone-400 italic">—</p>
+                      <p class="text-sm text-amber-500 dark:text-amber-400 italic">Not present in this version</p>
                     <% end %>
                   </div>
                 <% end %>
