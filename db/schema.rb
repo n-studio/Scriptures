@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_27_210902) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_27_213342) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -175,6 +175,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_210902) do
     t.string "text", null: false
     t.string "transliteration"
     t.datetime "updated_at", null: false
+    t.index ["lemma"], name: "index_original_language_tokens_on_lemma"
     t.index ["lexicon_entry_id"], name: "index_original_language_tokens_on_lexicon_entry_id"
     t.index ["passage_id", "position"], name: "index_original_language_tokens_on_passage_id_and_position", unique: true
     t.index ["passage_id"], name: "index_original_language_tokens_on_passage_id"
@@ -207,11 +208,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_210902) do
   create_table "passage_translations", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "passage_id", null: false
+    t.tsvector "search_vector"
     t.text "text", null: false
     t.integer "translation_id", null: false
     t.datetime "updated_at", null: false
     t.index ["passage_id", "translation_id"], name: "index_passage_translations_on_passage_id_and_translation_id", unique: true
     t.index ["passage_id"], name: "index_passage_translations_on_passage_id"
+    t.index ["search_vector"], name: "index_passage_translations_on_search_vector", using: :gin
     t.index ["translation_id"], name: "index_passage_translations_on_translation_id"
   end
 

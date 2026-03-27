@@ -1,48 +1,142 @@
 <div class="flex h-full">
-  <%# Results %>
   <div class="flex-1 flex flex-col overflow-hidden">
-    <div class="px-4 md:px-8 py-4 border-b border-stone-200 dark:border-stone-800 flex items-center gap-4">
+    <%# Header with result count %>
+    <div class="px-4 md:px-8 py-4 border-b border-stone-200 dark:border-stone-800">
       <% if @query.present? %>
-        <span class="text-sm">Results for <span class="font-bold">"<%= @query %>"</span></span>
-        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-stone-100 text-stone-800 dark:bg-stone-800 dark:text-stone-300">
-          <%= pluralize(@results.size, "result") %>
-        </span>
-      <% else %>
-        <span class="text-sm text-stone-500">Enter a search term above to search across all scriptures.</span>
+        <div class="flex items-center gap-3 mb-3">
+          <span class="text-sm">Results for <span class="font-bold">"<%= @query %>"</span></span>
+          <% if @total %>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-stone-100 text-stone-800 dark:bg-stone-800 dark:text-stone-300">
+              <%= pluralize(@total, "result") %>
+            </span>
+          <% end %>
+        </div>
       <% end %>
+
+      <%# Search mode tabs %>
+      <div class="flex flex-wrap items-center gap-1 text-xs font-medium">
+        <% { nil => "Full text", "concordance" => "Concordance", "lemma" => "Original language" }.each do |mode, label| %>
+          <%= link_to label, search_path(q: @query, mode: mode, scope: @scope, tradition_slug: params[:tradition_slug], corpus_slug: params[:corpus_slug]),
+                class: "px-2 py-1 rounded-md transition-colors #{@mode == mode ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900' : 'text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-900'}" %>
+        <% end %>
+
+        <% if @mode != "lemma" %>
+          <div class="h-4 w-px bg-stone-200 dark:bg-stone-800 mx-1"></div>
+          <span class="text-stone-400">in:</span>
+          <% { nil => "All", "tradition" => "Tradition", "corpus" => "Corpus", "annotations" => "My annotations" }.each do |scope, label| %>
+            <% next if scope == "annotations" && !authenticated? %>
+            <%= link_to label, search_path(q: @query, mode: @mode, scope: scope, tradition_slug: params[:tradition_slug], corpus_slug: params[:corpus_slug]),
+                  class: "px-2 py-1 rounded-md transition-colors #{@scope == scope ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900' : 'text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-900'}" %>
+          <% end %>
+
+          <% if @scope == "tradition" %>
+            <%= form_with url: search_path, method: :get, class: "flex items-center gap-1 ml-1" do |f| %>
+              <%= f.hidden_field :q, value: @query %>
+              <%= f.hidden_field :mode, value: @mode %>
+              <%= f.hidden_field :scope, value: "tradition" %>
+              <%= f.select :tradition_slug, Tradition.pluck(:name, :slug), { include_blank: "Choose..." }, class: "rounded-md border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-2 py-1 text-xs", onchange: "this.form.requestSubmit()" %>
+            <% end %>
+          <% elsif @scope == "corpus" %>
+            <%= form_with url: search_path, method: :get, class: "flex items-center gap-1 ml-1" do |f| %>
+              <%= f.hidden_field :q, value: @query %>
+              <%= f.hidden_field :mode, value: @mode %>
+              <%= f.hidden_field :scope, value: "corpus" %>
+              <%= f.select :corpus_slug, Corpus.pluck(:name, :slug), { include_blank: "Choose..." }, class: "rounded-md border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-2 py-1 text-xs", onchange: "this.form.requestSubmit()" %>
+            <% end %>
+          <% end %>
+        <% end %>
+
+        <% if @mode == "concordance" %>
+          <div class="h-4 w-px bg-stone-200 dark:bg-stone-800 mx-1"></div>
+          <%= form_with url: search_path, method: :get, class: "flex items-center gap-1" do |f| %>
+            <%= f.hidden_field :q, value: @query %>
+            <%= f.hidden_field :mode, value: "concordance" %>
+            <%= f.hidden_field :scope, value: @scope %>
+            <%= f.select :translation, Translation.distinct.pluck(:abbreviation), { include_blank: "All translations" }, class: "rounded-md border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-2 py-1 text-xs", onchange: "this.form.requestSubmit()" %>
+          <% end %>
+        <% end %>
+      </div>
     </div>
 
+    <%# Results %>
     <div class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
-      <% if @query.present? && @results.empty? %>
+      <% if @query.blank? %>
+        <p class="text-stone-400 text-sm">Enter a search term above to search across all scriptures.</p>
+        <% if @mode == "lemma" %>
+          <p class="text-stone-400 text-xs mt-1">Search by Strong's number (e.g. H430, G2316) or lemma text.</p>
+        <% end %>
+      <% elsif @results.empty? %>
         <p class="text-stone-400 text-sm">No results found for "<%= @query %>".</p>
-      <% end %>
-
-      <% @results.group_by { |pt| pt.passage.division.scripture.corpus }.each do |corpus, pts| %>
-        <section class="space-y-6">
-          <div class="flex items-center gap-4">
-            <h3 class="text-xs font-bold uppercase tracking-widest text-stone-400"><%= corpus.tradition.name %> / <%= corpus.name %></h3>
-            <div class="h-px flex-1 bg-stone-100 dark:bg-stone-900"></div>
-          </div>
-
-          <div class="space-y-4">
-            <% pts.each do |pt| %>
-              <% passage = pt.passage %>
-              <% division = passage.division %>
-              <% scripture = division.scripture %>
-              <%= link_to reading_path(corpus_slug: corpus.slug, scripture_slug: scripture.slug, division_number: division.number),
-                    class: "block space-y-1 group" do %>
-                <div class="flex items-center gap-2 text-[10px] font-bold text-stone-400 group-hover:text-blue-500 transition-colors">
-                  <span><%= scripture.name.upcase %> <%= division.number %>:<%= passage.number %></span>
-                  <%= chevron_right_icon %>
-                  <span><%= pt.translation.abbreviation %></span>
-                </div>
-                <p class="text-sm font-serif text-stone-600 dark:text-stone-400">
-                  <%= highlight(pt.text, @query, highlighter: '<span class="bg-amber-200/50 dark:bg-amber-900/50 px-1">\1</span>') %>
-                </p>
+      <% elsif @mode == "lemma" %>
+        <%# Original language results %>
+        <div class="space-y-3">
+          <% @results.each do |token| %>
+            <% passage = token.passage %>
+            <% scripture = passage.scripture %>
+            <% corpus = scripture.corpus %>
+            <%= link_to reading_path(corpus_slug: corpus.slug, scripture_slug: scripture.slug, division_number: passage.division.number),
+                  class: "block p-3 rounded-lg border border-stone-200 dark:border-stone-800 hover:border-blue-400 transition-colors" do %>
+              <div class="flex items-center gap-2 text-[10px] font-bold text-stone-400">
+                <span><%= scripture.name.upcase %> <%= passage.division.number %>:<%= passage.number %></span>
+                <span class="text-stone-300">·</span>
+                <span class="font-serif text-base"><%= token.text %></span>
+                <% if token.transliteration.present? %>
+                  <span class="font-normal italic"><%= token.transliteration %></span>
+                <% end %>
+                <% if token.lexicon_entry&.strongs_number %>
+                  <span class="font-mono"><%= token.lexicon_entry.strongs_number %></span>
+                <% end %>
+              </div>
+              <% if token.morphology.present? %>
+                <div class="text-[10px] text-stone-400 font-mono mt-0.5"><%= token.morphology %></div>
               <% end %>
             <% end %>
-          </div>
-        </section>
+          <% end %>
+        </div>
+      <% else %>
+        <%# Full-text / concordance results grouped by corpus %>
+        <% @results.group_by { |pt| pt.passage.division.scripture.corpus }.each do |corpus, pts| %>
+          <section class="space-y-4">
+            <div class="flex items-center gap-4">
+              <h3 class="text-xs font-bold uppercase tracking-widest text-stone-400"><%= corpus.tradition.name %> / <%= corpus.name %></h3>
+              <div class="h-px flex-1 bg-stone-100 dark:bg-stone-900"></div>
+            </div>
+            <div class="space-y-3">
+              <% pts.each do |pt| %>
+                <% passage = pt.passage %>
+                <% division = passage.division %>
+                <% scripture = division.scripture %>
+                <%= link_to reading_path(corpus_slug: corpus.slug, scripture_slug: scripture.slug, division_number: division.number),
+                      class: "block space-y-1 group" do %>
+                  <div class="flex items-center gap-2 text-[10px] font-bold text-stone-400 group-hover:text-blue-500 transition-colors">
+                    <span><%= scripture.name.upcase %> <%= division.number %>:<%= passage.number %></span>
+                    <%= chevron_right_icon %>
+                    <span><%= pt.translation.abbreviation %></span>
+                  </div>
+                  <p class="text-sm font-serif text-stone-600 dark:text-stone-400">
+                    <%= highlight(pt.text.truncate(300), @query, highlighter: '<span class="bg-amber-200/50 dark:bg-amber-900/50 px-0.5 rounded">\1</span>') %>
+                  </p>
+                <% end %>
+              <% end %>
+            </div>
+          </section>
+        <% end %>
+      <% end %>
+
+      <%# Pagination %>
+      <% if @total && @total > SearchController::PER_PAGE %>
+        <div class="flex items-center justify-center gap-2 pt-4">
+          <% total_pages = (@total.to_f / SearchController::PER_PAGE).ceil %>
+          <% if @page > 1 %>
+            <%= link_to "\u2190 Previous", search_path(q: @query, mode: @mode, scope: @scope, page: @page - 1, tradition_slug: params[:tradition_slug], corpus_slug: params[:corpus_slug], translation: params[:translation]),
+                  class: "px-3 py-1.5 rounded-md text-xs font-medium text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-900 transition-colors" %>
+          <% end %>
+          <span class="text-xs text-stone-400">Page <%= @page %> of <%= total_pages %></span>
+          <% if @page < total_pages %>
+            <%= link_to "Next \u2192", search_path(q: @query, mode: @mode, scope: @scope, page: @page + 1, tradition_slug: params[:tradition_slug], corpus_slug: params[:corpus_slug], translation: params[:translation]),
+                  class: "px-3 py-1.5 rounded-md text-xs font-medium text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-900 transition-colors" %>
+          <% end %>
+        </div>
       <% end %>
     </div>
   </div>
