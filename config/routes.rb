@@ -33,6 +33,7 @@ Rails.application.routes.draw do
 
   # Study tools
   resources :parallel_passages, only: :create
+  resources :ratings, only: :create
   get "word_study/:passage_id/:position", to: "word_studies#show", as: :word_study
   get "concordance/:id", to: "word_studies#concordance", as: :concordance
 

@@ -54,6 +54,8 @@ export default class extends Controller {
             ${data.transliteration ? `<div class="text-xs"><span class="text-stone-400">Transliteration:</span> <span class="font-medium">${this.#escapeHTML(data.transliteration)}</span></div>` : ""}
             ${data.lemma ? `<div class="text-xs"><span class="text-stone-400">Lemma:</span> <span class="font-medium font-serif">${this.#escapeHTML(data.lemma)}</span></div>` : ""}
             ${data.morphology ? `<div class="text-xs"><span class="text-stone-400">Morphology:</span> <span class="font-mono">${this.#escapeHTML(data.morphology)}</span></div>` : ""}
+            ${data.most_common_rendering ? `<div class="text-xs"><span class="text-stone-400">Most common:</span> <span class="font-medium">${this.#escapeHTML(data.most_common_rendering)}</span></div>` : ""}
+            ${data.other_renderings?.length ? `<div class="text-xs"><span class="text-stone-400">Also:</span> ${data.other_renderings.map(r => this.#escapeHTML(r)).join(", ")}</div>` : ""}
             <div class="text-xs text-stone-600 dark:text-stone-400 pt-1 border-t border-stone-100 dark:border-stone-800">${this.#escapeHTML(data.definition.substring(0, 150))}</div>
             ${data.strongs_number ? `<div class="text-[10px] text-stone-400">${this.#escapeHTML(data.strongs_number)} · ${data.concordance_count} occurrences</div>` : ""}
           </div>

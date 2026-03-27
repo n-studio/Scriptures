@@ -303,6 +303,9 @@
               <% if sd.description.present? %>
                 <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5 ml-5"><%= sd.description.truncate(200) %></p>
               <% end %>
+              <% if sd.bibliography_url.present? %>
+                <p class="text-[10px] ml-5 mt-0.5"><%= link_to "Scholarly literature \u2192", sd.bibliography_url, target: "_blank", rel: "noopener", class: "text-blue-500 hover:underline" %></p>
+              <% end %>
             <% end %>
           </div>
         <% end %>
@@ -324,6 +327,9 @@
                 <p class="text-xs font-serif rtl mt-0.5"><%= v.text.truncate(200) %></p>
                 <% if v.notes.present? %>
                   <p class="text-[10px] text-stone-400 mt-0.5 italic"><%= v.notes %></p>
+                <% end %>
+                <% if v.manuscript.facsimile_url.present? %>
+                  <p class="text-[10px] mt-0.5"><%= link_to "View facsimile \u2192", v.manuscript.facsimile_url, target: "_blank", rel: "noopener", class: "text-purple-500 hover:underline" %></p>
                 <% end %>
               </div>
             <% end %>

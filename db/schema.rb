@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_27_205331) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_27_210902) do
   create_table "annotation_tags", force: :cascade do |t|
     t.integer "annotation_id", null: false
     t.datetime "created_at", null: false
@@ -154,6 +154,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_205331) do
     t.datetime "created_at", null: false
     t.string "date_description"
     t.text "description"
+    t.string "facsimile_url"
     t.string "language"
     t.string "name", null: false
     t.datetime "updated_at", null: false
@@ -232,6 +233,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_205331) do
     t.index ["user_id"], name: "index_passkey_credentials_on_user_id"
   end
 
+  create_table "ratings", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "passage_translation_id", null: false
+    t.integer "score", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["passage_translation_id"], name: "index_ratings_on_passage_translation_id"
+    t.index ["user_id", "passage_translation_id"], name: "index_ratings_on_user_id_and_passage_translation_id", unique: true
+    t.index ["user_id"], name: "index_ratings_on_user_id"
+  end
+
   create_table "scriptures", force: :cascade do |t|
     t.integer "corpus_id", null: false
     t.datetime "created_at", null: false
@@ -255,6 +267,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_205331) do
 
   create_table "source_documents", force: :cascade do |t|
     t.string "abbreviation"
+    t.string "bibliography_url"
     t.string "color"
     t.integer "corpus_id", null: false
     t.datetime "created_at", null: false
@@ -348,6 +361,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_205331) do
   add_foreign_key "passage_translations", "translations"
   add_foreign_key "passages", "divisions"
   add_foreign_key "passkey_credentials", "users"
+  add_foreign_key "ratings", "passage_translations"
+  add_foreign_key "ratings", "users"
   add_foreign_key "scriptures", "corpora", column: "corpus_id"
   add_foreign_key "sessions", "users"
   add_foreign_key "source_documents", "corpora", column: "corpus_id"

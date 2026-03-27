@@ -45,12 +45,14 @@ p_source = SourceDocument.find_or_create_by!(abbreviation: "P", corpus: bible) d
   s.name = "Priestly Source"
   s.color = "blue"
   s.description = "The Priestly source, one of four sources of the Torah identified by the Documentary Hypothesis. Characterized by concern with ritual, genealogy, and precise chronology."
+  s.bibliography_url = "https://en.wikipedia.org/wiki/Priestly_source"
 end
 
 SourceDocument.find_or_create_by!(abbreviation: "J", corpus: bible) do |s|
   s.name = "Yahwist Source"
   s.color = "amber"
   s.description = "The Yahwist source, characterized by use of the divine name YHWH and vivid, anthropomorphic depictions of God."
+  s.bibliography_url = "https://en.wikipedia.org/wiki/Jahwist"
 end
 
 # Scriptures within Bible corpus
@@ -218,6 +220,7 @@ sinaiticus = Manuscript.find_or_create_by!(abbreviation: "01", corpus: bible) do
   m.date_description = "4th century CE"
   m.language = "Greek"
   m.description = "One of the oldest nearly complete manuscripts of the Greek Bible. Discovered at Saint Catherine's Monastery, Sinai."
+  m.facsimile_url = "https://codexsinaiticus.org/en/"
 end
 
 vaticanus = Manuscript.find_or_create_by!(abbreviation: "03", corpus: bible) do |m|
@@ -225,6 +228,7 @@ vaticanus = Manuscript.find_or_create_by!(abbreviation: "03", corpus: bible) do 
   m.date_description = "4th century CE"
   m.language = "Greek"
   m.description = "One of the oldest extant manuscripts of the Greek Bible, housed in the Vatican Library since at least the 15th century."
+  m.facsimile_url = "https://digi.vatlib.it/view/MSS_Vat.gr.1209"
 end
 
 Manuscript.find_or_create_by!(abbreviation: "WLC", corpus: bible) do |m|
