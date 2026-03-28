@@ -35,10 +35,14 @@ class PassagesController < ApplicationController
       @bookmarked_ids = current_user.bookmarks.where(passage_id: passage_ids).pluck(:passage_id).to_set
       @user_annotations = current_user.annotations.where(passage_id: passage_ids).group_by(&:passage_id)
       @user_collections = current_user.collections
+      @user_curricula = current_user.curricula
+      @read_passage_ids = current_user.reading_progresses.where(passage_id: passage_ids).pluck(:passage_id).to_set
     else
       @bookmarked_ids = Set.new
       @user_annotations = {}
       @user_collections = Collection.none
+      @user_curricula = Curriculum.none
+      @read_passage_ids = Set.new
     end
 
     # For parallel view

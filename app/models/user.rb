@@ -10,6 +10,8 @@ class User < ApplicationRecord
   has_many :collections, dependent: :destroy
   has_many :parallel_passages, dependent: :nullify
   has_many :ratings, dependent: :destroy
+  has_many :curricula, class_name: "Curriculum", dependent: :destroy
+  has_many :reading_progresses, dependent: :destroy
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 

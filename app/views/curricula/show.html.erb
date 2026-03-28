@@ -1,0 +1,103 @@
+<div class="h-full overflow-y-auto px-4 md:px-8 py-8 md:py-12 max-w-4xl mx-auto w-full">
+  <div class="flex items-center gap-2 text-xs font-medium text-stone-500 uppercase tracking-widest mb-8">
+    <%= link_to "Curricula", curricula_path, class: "hover:text-stone-900 dark:hover:text-stone-100 transition-colors" %>
+    <%= chevron_right_icon %>
+    <span class="text-stone-900 dark:text-stone-100"><%= @curriculum.name %></span>
+  </div>
+
+  <div class="mb-8">
+    <div class="flex items-start justify-between">
+      <div>
+        <h1 class="font-bold text-2xl mb-2"><%= @curriculum.name %></h1>
+        <% if @curriculum.description.present? %>
+          <p class="text-stone-500 text-sm mb-3"><%= @curriculum.description %></p>
+        <% end %>
+        <div class="flex items-center gap-3 text-xs text-stone-400">
+          <span><%= pluralize(@items.size, "passage") %></span>
+          <% if @curriculum.curriculum_type.present? %>
+            <span class="px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium"><%= @curriculum.curriculum_type.titleize %></span>
+          <% end %>
+          <% if @curriculum.public? %>
+            <span class="px-1.5 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-medium">Public</span>
+          <% end %>
+        </div>
+      </div>
+      <% if authenticated? && @curriculum.user == current_user %>
+        <div class="flex items-center gap-2">
+          <%= link_to "Edit", edit_curriculum_path(@curriculum), class: "text-xs text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 transition-colors" %>
+          <%= link_to "Export", export_curriculum_path(@curriculum, format: :text), class: "text-xs text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 transition-colors" %>
+        </div>
+      <% elsif @curriculum.public? %>
+        <%= link_to "Export", export_curriculum_path(@curriculum, format: :text), class: "text-xs text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 transition-colors" %>
+      <% end %>
+    </div>
+
+    <%# Progress bar %>
+    <% if authenticated? && @items.any? %>
+      <div class="mt-4 flex items-center gap-3">
+        <div class="flex-1 h-2 bg-stone-100 dark:bg-stone-800 rounded-full overflow-hidden">
+          <div class="h-full bg-blue-500 rounded-full transition-all duration-300" style="width: <%= @progress %>%"></div>
+        </div>
+        <span class="text-xs text-stone-500 font-medium whitespace-nowrap"><%= @progress %>% complete (<%= @read_ids.size %>/<%= @items.size %>)</span>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @items.any? %>
+    <div class="space-y-2" data-controller="reorder" data-reorder-url-value="<%= reorder_curriculum_path(@curriculum) %>">
+      <% @items.each do |item| %>
+        <% passage = item.passage %>
+        <% scripture = passage.division.scripture %>
+        <% corpus = scripture.corpus %>
+        <% is_read = @read_ids.include?(passage.id) %>
+        <div class="flex items-center gap-3 p-4 border border-stone-200 dark:border-stone-800 rounded-xl hover:border-stone-400 dark:hover:border-stone-600 transition-colors <%= 'opacity-60' if is_read %>"
+             data-reorder-target="item"
+             data-item-id="<%= item.id %>">
+          <% if authenticated? && @curriculum.user == current_user %>
+            <div class="cursor-grab text-stone-300 dark:text-stone-700 hover:text-stone-500" data-reorder-target="handle">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg>
+            </div>
+          <% end %>
+
+          <%# Read/unread toggle %>
+          <% if authenticated? %>
+            <% if is_read %>
+              <%= button_to mark_unread_curriculum_path(@curriculum, passage_id: passage.id), method: :delete, class: "shrink-0" do %>
+                <div class="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+              <% end %>
+            <% else %>
+              <%= button_to mark_read_curriculum_path(@curriculum, passage_id: passage.id), method: :post, class: "shrink-0" do %>
+                <div class="w-5 h-5 rounded-full border-2 border-stone-300 dark:border-stone-700 hover:border-blue-500 transition-colors"></div>
+              <% end %>
+            <% end %>
+          <% end %>
+
+          <%= link_to reading_path(corpus_slug: corpus.slug, scripture_slug: scripture.slug, division_number: passage.division.number),
+                class: "flex-1 min-w-0" do %>
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-stone-400 font-mono"><%= item.position %>.</span>
+              <span class="font-medium <%= 'line-through' if is_read %>"><%= scripture.name %> <%= passage.division.number %>:<%= passage.number %></span>
+            </div>
+            <% if item.title.present? %>
+              <div class="text-sm text-stone-600 dark:text-stone-400 mt-0.5 ml-6"><%= item.title %></div>
+            <% end %>
+            <% if item.notes.present? %>
+              <div class="text-xs text-stone-400 mt-0.5 ml-6"><%= item.notes %></div>
+            <% end %>
+            <div class="text-xs text-stone-400 mt-0.5 ml-6"><%= corpus.name %></div>
+          <% end %>
+
+          <% if authenticated? && @curriculum.user == current_user %>
+            <%= button_to remove_passage_curriculum_path(@curriculum, passage_id: passage.id), method: :delete, class: "text-xs text-red-500 hover:underline ml-2 shrink-0" do %>
+              Remove
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-stone-500 text-sm">No passages in this curriculum yet. Add passages from the reading view.</p>
+  <% end %>
+</div>

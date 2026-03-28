@@ -1,0 +1,43 @@
+<div class="h-full overflow-y-auto px-4 md:px-8 py-8 md:py-12 max-w-4xl mx-auto w-full">
+  <div class="flex items-center justify-between mb-8">
+    <h1 class="font-bold text-2xl">Curricula</h1>
+    <%= link_to "New curriculum", new_curriculum_path, class: "rounded-lg px-4 py-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-sm font-medium hover:bg-stone-800 dark:hover:bg-stone-200 transition-colors" %>
+  </div>
+
+  <% if @curricula.any? %>
+    <div class="space-y-3">
+      <% @curricula.each do |curriculum| %>
+        <div class="flex items-center justify-between p-4 border border-stone-200 dark:border-stone-800 rounded-xl hover:border-stone-400 dark:hover:border-stone-600 transition-colors">
+          <%= link_to curriculum_path(curriculum), class: "flex-1" do %>
+            <div class="flex items-center gap-2">
+              <div class="font-medium"><%= curriculum.name %></div>
+              <% if curriculum.curriculum_type.present? %>
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"><%= curriculum.curriculum_type.titleize %></span>
+              <% end %>
+            </div>
+            <div class="text-xs text-stone-500 mt-0.5">
+              <%= pluralize(curriculum.curriculum_items.size, "passage") %>
+              <% if curriculum.public? %>
+                <span class="ml-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">Public</span>
+              <% end %>
+            </div>
+            <% progress = curriculum.progress_for(current_user) %>
+            <% if progress > 0 %>
+              <div class="mt-2 flex items-center gap-2">
+                <div class="flex-1 h-1.5 bg-stone-100 dark:bg-stone-800 rounded-full overflow-hidden">
+                  <div class="h-full bg-blue-500 rounded-full" style="width: <%= progress %>%"></div>
+                </div>
+                <span class="text-[10px] text-stone-400 font-medium"><%= progress %>%</span>
+              </div>
+            <% end %>
+          <% end %>
+          <%= button_to curriculum_path(curriculum), method: :delete, class: "text-xs text-red-500 hover:underline ml-4", data: { turbo_confirm: "Delete curriculum?" } do %>
+            Delete
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-stone-500 text-sm">No curricula yet. Create one to build a structured reading sequence.</p>
+  <% end %>
+</div>

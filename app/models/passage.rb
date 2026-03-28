@@ -8,6 +8,8 @@ class Passage < ApplicationRecord
   has_many :textual_variants, dependent: :destroy
   has_many :parallel_passages, dependent: :destroy
   has_many :commentaries, dependent: :destroy
+  has_many :curriculum_items, dependent: :destroy
+  has_many :reading_progresses, dependent: :destroy
 
   default_scope { order(:position) }
 

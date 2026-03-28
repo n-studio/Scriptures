@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_27_213342) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_28_202541) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -99,6 +99,30 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_213342) do
     t.datetime "updated_at", null: false
     t.index ["slug"], name: "index_corpora_on_slug", unique: true
     t.index ["tradition_id"], name: "index_corpora_on_tradition_id"
+  end
+
+  create_table "curricula", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "curriculum_type"
+    t.text "description"
+    t.string "name", null: false
+    t.boolean "public", default: false, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_curricula_on_user_id"
+  end
+
+  create_table "curriculum_items", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "curriculum_id", null: false
+    t.text "notes"
+    t.bigint "passage_id", null: false
+    t.integer "position", null: false
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.index ["curriculum_id", "passage_id"], name: "index_curriculum_items_on_curriculum_id_and_passage_id", unique: true
+    t.index ["curriculum_id"], name: "index_curriculum_items_on_curriculum_id"
+    t.index ["passage_id"], name: "index_curriculum_items_on_passage_id"
   end
 
   create_table "divisions", force: :cascade do |t|
@@ -250,6 +274,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_213342) do
     t.index ["user_id"], name: "index_ratings_on_user_id"
   end
 
+  create_table "reading_progresses", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "passage_id", null: false
+    t.datetime "read_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["passage_id"], name: "index_reading_progresses_on_passage_id"
+    t.index ["user_id", "passage_id"], name: "index_reading_progresses_on_user_id_and_passage_id", unique: true
+    t.index ["user_id"], name: "index_reading_progresses_on_user_id"
+  end
+
   create_table "scriptures", force: :cascade do |t|
     t.integer "corpus_id", null: false
     t.datetime "created_at", null: false
@@ -349,6 +384,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_213342) do
   add_foreign_key "commentaries", "passages"
   add_foreign_key "composition_dates", "scriptures"
   add_foreign_key "corpora", "traditions"
+  add_foreign_key "curricula", "users"
+  add_foreign_key "curriculum_items", "curricula", column: "curriculum_id"
+  add_foreign_key "curriculum_items", "passages"
   add_foreign_key "divisions", "divisions", column: "parent_id"
   add_foreign_key "divisions", "scriptures"
   add_foreign_key "highlights", "passages"
@@ -369,6 +407,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_213342) do
   add_foreign_key "passkey_credentials", "users"
   add_foreign_key "ratings", "passage_translations"
   add_foreign_key "ratings", "users"
+  add_foreign_key "reading_progresses", "passages"
+  add_foreign_key "reading_progresses", "users"
   add_foreign_key "scriptures", "corpora", column: "corpus_id"
   add_foreign_key "sessions", "users"
   add_foreign_key "source_documents", "corpora", column: "corpus_id"

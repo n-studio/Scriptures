@@ -31,6 +31,20 @@ Rails.application.routes.draw do
     end
   end
 
+  # Research tools
+  resources :curricula, only: %i[index show new create edit update destroy] do
+    member do
+      post :add_passage
+      delete :remove_passage
+      patch :reorder
+      post :mark_read
+      delete :mark_unread
+      get :export
+    end
+  end
+  resources :reading_progresses, only: :create
+  delete "reading_progress", to: "reading_progresses#destroy", as: :reading_progress
+
   # Study tools
   resources :parallel_passages, only: :create
   resources :ratings, only: :create
