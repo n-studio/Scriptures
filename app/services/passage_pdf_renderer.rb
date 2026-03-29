@@ -9,7 +9,7 @@ class PassagePdfRenderer
   FONT_DIR = Rails.root.join("app/assets/fonts")
 
   def render
-    pdf = Prawn::Document.new(page_size: "A4", margin: [50, 50, 50, 50])
+    pdf = Prawn::Document.new(page_size: "A4", margin: [ 50, 50, 50, 50 ])
     pdf.font_families.update("DejaVu" => {
       normal: FONT_DIR.join("DejaVuSans.ttf").to_s,
       bold: FONT_DIR.join("DejaVuSans-Bold.ttf").to_s
@@ -73,12 +73,12 @@ class PassagePdfRenderer
   def render_parallel_passage(pdf, passage)
     data = @translations.map do |t|
       text = passage.text_for(t)
-      ["#{t.abbreviation}\n#{text || '—'}"]
+      [ "#{t.abbreviation}\n#{text || '—'}" ]
     end
 
     if data.any?
-      verse_label = [["#{passage.number}"]]
-      table_data = [data.map { |d| d[0] }]
+      verse_label = [ [ "#{passage.number}" ] ]
+      table_data = [ data.map { |d| d[0] } ]
 
       pdf.font_size(9) do
         pdf.text "<b>#{passage.number}</b>", inline_format: true, size: 10

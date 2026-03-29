@@ -8,7 +8,7 @@ class CollectionPdfRenderer
   FONT_DIR = Rails.root.join("app/assets/fonts")
 
   def render
-    pdf = Prawn::Document.new(page_size: "A4", margin: [50, 50, 50, 50])
+    pdf = Prawn::Document.new(page_size: "A4", margin: [ 50, 50, 50, 50 ])
     pdf.font_families.update("DejaVu" => {
       normal: FONT_DIR.join("DejaVuSans.ttf").to_s,
       bold: FONT_DIR.join("DejaVuSans-Bold.ttf").to_s

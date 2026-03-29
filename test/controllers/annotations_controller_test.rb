@@ -27,7 +27,7 @@ class AnnotationsControllerTest < ActionDispatch::IntegrationTest
 
   test "export JSON returns annotations" do
     users(:scholar).annotations.create!(passage: passages(:genesis_one_one), body: "Export me")
-    get export_annotations_path(format: :json)
+    get annotations_export_path(format: :json)
     assert_response :success
     assert_equal "application/json", response.media_type
     data = JSON.parse(response.body)
@@ -40,7 +40,7 @@ class AnnotationsControllerTest < ActionDispatch::IntegrationTest
 
   test "export CSV returns annotations" do
     users(:scholar).annotations.create!(passage: passages(:genesis_one_one), body: "Export CSV")
-    get export_annotations_path(format: :csv)
+    get annotations_export_path(format: :csv)
     assert_response :success
     assert_equal "text/csv", response.media_type
     assert_includes response.body, "Export CSV"
@@ -55,7 +55,7 @@ class AnnotationsControllerTest < ActionDispatch::IntegrationTest
         chapter: 1,
         verse: 1,
         body: "Imported annotation",
-        tags: ["imported"],
+        tags: [ "imported" ],
         public: false
       }
     ].to_json
@@ -65,7 +65,7 @@ class AnnotationsControllerTest < ActionDispatch::IntegrationTest
     )
 
     assert_difference "Annotation.count", 1 do
-      post import_annotations_path, params: { file: file }
+      post annotations_import_path, params: { file: file }
     end
     assert_redirected_to annotations_path(user_id: users(:scholar))
     assert_equal "Imported annotation", Annotation.last.body
@@ -73,14 +73,14 @@ class AnnotationsControllerTest < ActionDispatch::IntegrationTest
 
   test "import JSON deduplicates" do
     users(:scholar).annotations.create!(passage: passages(:genesis_one_one), body: "Already here")
-    json = [{ corpus: "bible", scripture: "genesis", chapter: 1, verse: 1, body: "Already here" }].to_json
+    json = [ { corpus: "bible", scripture: "genesis", chapter: 1, verse: 1, body: "Already here" } ].to_json
 
     file = Rack::Test::UploadedFile.new(
       StringIO.new(json), "application/json", false, original_filename: "annotations.json"
     )
 
     assert_no_difference "Annotation.count" do
-      post import_annotations_path, params: { file: file }
+      post annotations_import_path, params: { file: file }
     end
   end
 
@@ -95,7 +95,7 @@ class AnnotationsControllerTest < ActionDispatch::IntegrationTest
     users(:scholar).annotations.create!(passage: passages(:genesis_one_one), body: "Public note", public: true)
     users(:scholar).annotations.create!(passage: passages(:genesis_one_one), body: "Private note", public: false)
     sign_out
-    get public_annotations_path(user_id: users(:scholar))
+    get annotations_shared_path(user_id: users(:scholar))
     assert_response :success
     assert_select "p", /Public note/
     assert_select "p", { text: /Private note/, count: 0 }

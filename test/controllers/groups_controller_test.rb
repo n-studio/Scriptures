@@ -19,7 +19,7 @@ class GroupsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "create makes a new group with owner membership" do
-    assert_difference ["Group.count", "GroupMembership.count"], 1 do
+    assert_difference [ "Group.count", "GroupMembership.count" ], 1 do
       post groups_path, params: { group: { name: "Research Team" } }
     end
     group = Group.last
@@ -53,7 +53,7 @@ class GroupsControllerTest < ActionDispatch::IntegrationTest
     group = Group.create!(name: "Test", owner: users(:scholar))
     group.group_memberships.create!(user: users(:scholar), role: "owner")
     assert_enqueued_emails 1 do
-      post invite_group_path(group), params: { email: "invitee@example.com", role: "editor" }
+      post group_invitations_path(group), params: { email: "invitee@example.com", role: "editor" }
     end
     assert_redirected_to group_path(group)
   end
@@ -61,7 +61,7 @@ class GroupsControllerTest < ActionDispatch::IntegrationTest
   test "accept_invitation joins group" do
     group = Group.create!(name: "Test", owner: users(:scholar))
     inv = group.group_invitations.create!(email: "scholar@example.com", invited_by: users(:scholar), role: "viewer")
-    get accept_invitation_groups_path(token: inv.token)
+    get group_invitation_accept_path(token: inv.token)
     assert_redirected_to group_path(group)
     assert group.member?(users(:scholar))
   end
@@ -71,7 +71,7 @@ class GroupsControllerTest < ActionDispatch::IntegrationTest
     other = User.create!(email_address: "member@example.com")
     group.group_memberships.create!(user: other, role: "viewer")
     sign_in_as(other)
-    delete leave_group_path(group)
+    delete group_membership_path(group)
     assert_redirected_to groups_path
     assert_not group.member?(other)
   end

@@ -7,7 +7,7 @@ class ExportsControllerTest < ActionDispatch::IntegrationTest
       scripture_slug: "genesis",
       format: :pdf,
       from_chapter: 1,
-      t: ["KJV"]
+      t: [ "KJV" ]
     )
     assert_response :success
     assert_equal "application/pdf", response.media_type
@@ -22,7 +22,7 @@ class ExportsControllerTest < ActionDispatch::IntegrationTest
       format: :pdf,
       from_chapter: 1,
       to_chapter: 1,
-      t: ["KJV", "WLC"],
+      t: [ "KJV", "WLC" ],
       parallel: "1",
       sources: "1",
       commentary: "1",

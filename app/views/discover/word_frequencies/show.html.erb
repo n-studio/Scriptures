@@ -9,7 +9,7 @@
     <h1 class="font-bold text-2xl">Word Frequency</h1>
     <div class="flex items-center gap-2 text-xs">
       <% @corpora.each do |c| %>
-        <%= link_to c.name, word_frequency_path(corpus_slug: c.slug),
+        <%= link_to c.name, discover_word_frequency_path(corpus_slug: c.slug),
               class: "px-2 py-1 rounded-md font-medium transition-colors #{c == @corpus ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900' : 'text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-900'}" %>
       <% end %>
     </div>

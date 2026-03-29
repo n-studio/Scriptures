@@ -32,7 +32,7 @@
             <div class="text-xs text-stone-500 mt-0.5"><%= corpus.name %></div>
           <% end %>
           <% if authenticated? && @collection.user == current_user %>
-            <%= button_to remove_passage_collection_path(@collection, passage_id: passage.id), method: :delete, class: "text-xs text-red-500 hover:underline ml-4" do %>
+            <%= button_to collections_passage_path(id: passage.id, collection_id: @collection.id, passage_id: passage.id), method: :delete, class: "text-xs text-red-500 hover:underline ml-4" do %>
               Remove
             <% end %>
           <% end %>

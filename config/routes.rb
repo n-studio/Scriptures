@@ -1,18 +1,14 @@
 Rails.application.routes.draw do
   # Authentication
-  resource :session, only: %i[new create destroy] do
-    get "magic_token", on: :member
-    get "verify", on: :member
-    post "verify_code", on: :member
-  end
+  resource :session, only: %i[new create destroy]
+  resource :session_verification, only: %i[show create], controller: "sessions/verifications"
+  get "session/magic_token", to: "sessions/magic_tokens#show", as: :session_magic_token
   resource :account, only: %i[show update]
-  resources :passkey_credentials, only: %i[create destroy] do
-    collection do
-      post :options_for_create
-      post :options_for_authenticate
-    end
+  resources :passkey_credentials, only: %i[create destroy]
+  namespace :passkey_credentials do
+    resource :options, only: %i[show create]
+    resource :authentication, only: :create
   end
-  post "passkey_authenticate", to: "passkey_credentials#authenticate"
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   get "up" => "rails/health#show", as: :rails_health_check
@@ -25,67 +21,60 @@ Rails.application.routes.draw do
   # Organization
   resources :bookmarks, only: %i[index create destroy]
   resources :highlights, only: %i[create destroy]
-  resources :annotations, only: %i[index create update destroy] do
-    collection do
-      get :export
-      post :import
-    end
+  resources :annotations, only: %i[index create update destroy]
+  namespace :annotations do
+    resource :export, only: :show
+    resource :import, only: :create
+    get "shared/:user_id", to: "shared#show", as: :shared
   end
-  get "annotations/shared/:user_id", to: "annotations#public_set", as: :public_annotations
-  resources :collections, only: %i[index show create update destroy] do
-    member do
-      post :add_passage
-      delete :remove_passage
-    end
+  namespace :collections do
+    resources :passages, only: %i[create destroy]
   end
+  resources :collections, only: %i[index show create update destroy]
 
   # Groups & collaboration
   resources :groups, only: %i[index show new create edit update destroy] do
-    member do
-      post :invite
-      delete :remove_member
-      delete :leave
-    end
-    collection do
-      get :accept_invitation
-    end
+    resources :invitations, only: :create, module: :groups
+    resource :membership, only: :destroy, module: :groups
   end
+  get "groups/invitations/:token", to: "groups/invitations#show", as: :group_invitation_accept
   resources :annotation_comments, only: %i[create destroy]
 
   # Research tools
-  resources :curricula, only: %i[index show new create edit update destroy] do
-    member do
-      post :add_passage
-      delete :remove_passage
-      patch :reorder
-      post :mark_read
-      delete :mark_unread
-      get :export
-    end
+  namespace :curricula do
+    resources :passages, only: %i[create destroy]
+    resource :positions, only: :update
+    resources :read_progresses, only: %i[create destroy]
+    resource :export, only: :show
+  end
+  resources :curricula, only: %i[index show new create edit update destroy]
+  namespace :reading_progresses do
+    resource :time, only: :create
   end
   resources :reading_progresses, only: :create
-  post "reading_progresses/time", to: "reading_progresses#time", as: :reading_progress_time
   delete "reading_progress", to: "reading_progresses#destroy", as: :reading_progress
 
   # Study tools
   resources :parallel_passages, only: :create
   resources :ratings, only: :create
   get "word_study/:passage_id/:position", to: "word_studies#show", as: :word_study
-  get "concordance/:id", to: "word_studies#concordance", as: :concordance
+  resources :concordances, only: :show
 
   # Export (collection route must come before passages to avoid slug matching)
   get "export/collection/:id", to: "exports#collection", as: :export_collection
   get "export/:corpus_slug/:scripture_slug", to: "exports#passages", as: :export_passages
 
   # Discovery & statistics
+  namespace :discover do
+    resource :stats, only: :show
+    resource :word_frequency, only: :show
+    resource :exploration, only: :show
+  end
   get "discover", to: "discover#index", as: :discover
-  get "stats", to: "discover#stats", as: :stats
-  get "word_frequency", to: "discover#word_frequency", as: :word_frequency
-  get "exploration", to: "discover#exploration", as: :exploration
 
   # Search & jump-to-reference
   get "search", to: "search#index", as: :search
-  get "jump", to: "passages#jump", as: :jump
+  resource :jump, only: :show
 
   # Canonical passage URLs: /bible/genesis/1
   get ":corpus_slug/:scripture_slug/:division_number", to: "passages#show", as: :reading

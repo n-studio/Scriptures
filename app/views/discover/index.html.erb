@@ -27,19 +27,19 @@
   <%# Quick links %>
   <div class="grid md:grid-cols-3 gap-4">
     <% if authenticated? %>
-      <%= link_to stats_path, class: "p-5 border border-stone-200 dark:border-stone-800 rounded-xl hover:border-stone-400 dark:hover:border-stone-600 transition-colors" do %>
+      <%= link_to discover_stats_path, class: "p-5 border border-stone-200 dark:border-stone-800 rounded-xl hover:border-stone-400 dark:hover:border-stone-600 transition-colors" do %>
         <h3 class="font-bold text-sm mb-1">Reading Statistics</h3>
         <p class="text-xs text-stone-500">Passages read, time spent, and words encountered.</p>
       <% end %>
     <% end %>
 
-    <%= link_to word_frequency_path, class: "p-5 border border-stone-200 dark:border-stone-800 rounded-xl hover:border-stone-400 dark:hover:border-stone-600 transition-colors" do %>
+    <%= link_to discover_word_frequency_path, class: "p-5 border border-stone-200 dark:border-stone-800 rounded-xl hover:border-stone-400 dark:hover:border-stone-600 transition-colors" do %>
       <h3 class="font-bold text-sm mb-1">Word Frequency</h3>
       <p class="text-xs text-stone-500">Most common words in the original languages.</p>
     <% end %>
 
     <% if authenticated? %>
-      <%= link_to exploration_path, class: "p-5 border border-stone-200 dark:border-stone-800 rounded-xl hover:border-stone-400 dark:hover:border-stone-600 transition-colors" do %>
+      <%= link_to discover_exploration_path, class: "p-5 border border-stone-200 dark:border-stone-800 rounded-xl hover:border-stone-400 dark:hover:border-stone-600 transition-colors" do %>
         <h3 class="font-bold text-sm mb-1">Exploration Map</h3>
         <p class="text-xs text-stone-500">Visual overview of your reading coverage.</p>
       <% end %>

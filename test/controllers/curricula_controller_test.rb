@@ -66,7 +66,7 @@ class CurriculaControllerTest < ActionDispatch::IntegrationTest
   test "add_passage adds to curriculum" do
     curriculum = users(:scholar).curricula.create!(name: "Test")
     assert_difference "CurriculumItem.count", 1 do
-      post add_passage_curriculum_path(curriculum, passage_id: passages(:genesis_one_one).id)
+      post curricula_passages_path(curriculum_id: curriculum.id, passage_id: passages(:genesis_one_one).id)
     end
   end
 
@@ -74,7 +74,7 @@ class CurriculaControllerTest < ActionDispatch::IntegrationTest
     curriculum = users(:scholar).curricula.create!(name: "Test")
     curriculum.curriculum_items.create!(passage: passages(:genesis_one_one), position: 1)
     assert_difference "CurriculumItem.count", -1 do
-      delete remove_passage_curriculum_path(curriculum, passage_id: passages(:genesis_one_one).id)
+      delete curricula_passage_path(id: passages(:genesis_one_one).id, curriculum_id: curriculum.id, passage_id: passages(:genesis_one_one).id)
     end
   end
 
@@ -82,7 +82,7 @@ class CurriculaControllerTest < ActionDispatch::IntegrationTest
     curriculum = users(:scholar).curricula.create!(name: "Test")
     curriculum.curriculum_items.create!(passage: passages(:genesis_one_one), position: 1)
     assert_difference "ReadingProgress.count", 1 do
-      post mark_read_curriculum_path(curriculum, passage_id: passages(:genesis_one_one).id)
+      post curricula_read_progresses_path(curriculum_id: curriculum.id, passage_id: passages(:genesis_one_one).id)
     end
   end
 
@@ -90,14 +90,14 @@ class CurriculaControllerTest < ActionDispatch::IntegrationTest
     curriculum = users(:scholar).curricula.create!(name: "Test")
     users(:scholar).reading_progresses.create!(passage: passages(:genesis_one_one), read_at: Time.current)
     assert_difference "ReadingProgress.count", -1 do
-      delete mark_unread_curriculum_path(curriculum, passage_id: passages(:genesis_one_one).id)
+      delete curricula_read_progress_path(id: passages(:genesis_one_one).id, curriculum_id: curriculum.id, passage_id: passages(:genesis_one_one).id)
     end
   end
 
   test "export returns text file" do
     curriculum = users(:scholar).curricula.create!(name: "Test Curriculum")
     curriculum.curriculum_items.create!(passage: passages(:genesis_one_one), position: 1)
-    get export_curriculum_path(curriculum, format: :text)
+    get curricula_export_path(curriculum_id: curriculum.id, format: :text)
     assert_response :success
     assert_equal "text/plain", response.media_type
     assert_includes response.body, "Test Curriculum"

@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   async register() {
     try {
-      const optionsResponse = await fetch("/passkey_credentials/options_for_create", {
+      const optionsResponse = await fetch("/passkey_credentials/options", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

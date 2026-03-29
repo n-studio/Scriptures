@@ -25,10 +25,10 @@
       <% if authenticated? && @curriculum.user == current_user %>
         <div class="flex items-center gap-2">
           <%= link_to "Edit", edit_curriculum_path(@curriculum), class: "text-xs text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 transition-colors" %>
-          <%= link_to "Export", export_curriculum_path(@curriculum, format: :text), class: "text-xs text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 transition-colors" %>
+          <%= link_to "Export", curricula_export_path(curriculum_id: @curriculum.id, format: :text), class: "text-xs text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 transition-colors" %>
         </div>
       <% elsif @curriculum.public? %>
-        <%= link_to "Export", export_curriculum_path(@curriculum, format: :text), class: "text-xs text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 transition-colors" %>
+        <%= link_to "Export", curricula_export_path(curriculum_id: @curriculum.id, format: :text), class: "text-xs text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 transition-colors" %>
       <% end %>
     </div>
 
@@ -44,7 +44,7 @@
   </div>
 
   <% if @items.any? %>
-    <div class="space-y-2" data-controller="reorder" data-reorder-url-value="<%= reorder_curriculum_path(@curriculum) %>">
+    <div class="space-y-2" data-controller="reorder" data-reorder-url-value="<%= curricula_positions_path(curriculum_id: @curriculum.id) %>">
       <% @items.each do |item| %>
         <% passage = item.passage %>
         <% scripture = passage.division.scripture %>
@@ -62,13 +62,13 @@
           <%# Read/unread toggle %>
           <% if authenticated? %>
             <% if is_read %>
-              <%= button_to mark_unread_curriculum_path(@curriculum, passage_id: passage.id), method: :delete, class: "shrink-0" do %>
+              <%= button_to curricula_read_progress_path(id: passage.id, curriculum_id: @curriculum.id, passage_id: passage.id), method: :delete, class: "shrink-0" do %>
                 <div class="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
                   <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                 </div>
               <% end %>
             <% else %>
-              <%= button_to mark_read_curriculum_path(@curriculum, passage_id: passage.id), method: :post, class: "shrink-0" do %>
+              <%= button_to curricula_read_progresses_path(curriculum_id: @curriculum.id, passage_id: passage.id), method: :post, class: "shrink-0" do %>
                 <div class="w-5 h-5 rounded-full border-2 border-stone-300 dark:border-stone-700 hover:border-blue-500 transition-colors"></div>
               <% end %>
             <% end %>
@@ -90,7 +90,7 @@
           <% end %>
 
           <% if authenticated? && @curriculum.user == current_user %>
-            <%= button_to remove_passage_curriculum_path(@curriculum, passage_id: passage.id), method: :delete, class: "text-xs text-red-500 hover:underline ml-2 shrink-0" do %>
+            <%= button_to curricula_passage_path(id: passage.id, curriculum_id: @curriculum.id, passage_id: passage.id), method: :delete, class: "text-xs text-red-500 hover:underline ml-2 shrink-0" do %>
               Remove
             <% end %>
           <% end %>

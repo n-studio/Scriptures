@@ -10,7 +10,7 @@
   <% if @tags.any? %>
     <div class="flex flex-wrap items-center gap-2 mb-6 text-xs">
       <% @tags.each do |tag| %>
-        <%= link_to tag.name, public_annotations_path(user_id: @user, tag: tag.name),
+        <%= link_to tag.name, annotations_shared_path(user_id: @user, tag: tag.name),
               class: "px-2 py-0.5 rounded-full border border-stone-300 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-900 transition-colors #{params[:tag] == tag.name ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 border-transparent' : ''}" %>
       <% end %>
     </div>

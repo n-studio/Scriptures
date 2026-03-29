@@ -33,7 +33,7 @@ class CollectionsControllerTest < ActionDispatch::IntegrationTest
   test "add_passage adds to collection" do
     collection = users(:scholar).collections.create!(name: "Test")
     assert_difference "CollectionPassage.count", 1 do
-      post add_passage_collection_path(collection, passage_id: passages(:genesis_one_one).id)
+      post collections_passages_path(collection_id: collection.id, passage_id: passages(:genesis_one_one).id)
     end
   end
 
@@ -41,7 +41,7 @@ class CollectionsControllerTest < ActionDispatch::IntegrationTest
     collection = users(:scholar).collections.create!(name: "Test")
     collection.collection_passages.create!(passage: passages(:genesis_one_one), position: 1)
     assert_difference "CollectionPassage.count", -1 do
-      delete remove_passage_collection_path(collection, passage_id: passages(:genesis_one_one).id)
+      delete collections_passage_path(id: passages(:genesis_one_one).id, collection_id: collection.id, passage_id: passages(:genesis_one_one).id)
     end
   end
 end

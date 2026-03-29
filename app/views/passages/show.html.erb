@@ -275,7 +275,7 @@
                           </summary>
                           <div class="absolute left-0 top-6 z-10 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg shadow-lg py-1 min-w-40">
                             <% @user_collections.each do |col| %>
-                              <%= button_to add_passage_collection_path(col, passage_id: passage.id), class: "w-full text-left px-3 py-1.5 text-xs hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors" do %>
+                              <%= button_to collections_passages_path(collection_id: col.id, passage_id: passage.id), class: "w-full text-left px-3 py-1.5 text-xs hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors" do %>
                                 <%= col.name %>
                               <% end %>
                             <% end %>
@@ -291,7 +291,7 @@
                           </summary>
                           <div class="absolute left-0 top-6 z-10 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg shadow-lg py-1 min-w-40">
                             <% @user_curricula.each do |cur| %>
-                              <%= button_to add_passage_curriculum_path(cur, passage_id: passage.id), class: "w-full text-left px-3 py-1.5 text-xs hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors" do %>
+                              <%= button_to curricula_passages_path(curriculum_id: cur.id, passage_id: passage.id), class: "w-full text-left px-3 py-1.5 text-xs hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors" do %>
                                 <%= cur.name %>
                               <% end %>
                             <% end %>

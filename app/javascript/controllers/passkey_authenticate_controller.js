@@ -3,8 +3,8 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   async authenticate() {
     try {
-      const optionsResponse = await fetch("/passkey_credentials/options_for_authenticate", {
-        method: "POST",
+      const optionsResponse = await fetch("/passkey_credentials/options", {
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
           "X-CSRF-Token": document.querySelector("meta[name='csrf-token']").content
@@ -21,7 +21,7 @@ export default class extends Controller {
 
       const credential = await navigator.credentials.get({ publicKey: options })
 
-      const response = await fetch("/passkey_authenticate", {
+      const response = await fetch("/passkey_credentials/authentication", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
