@@ -9,7 +9,7 @@ class Curricula::PositionsControllerTest < ActionDispatch::IntegrationTest
     item2 = curriculum.curriculum_items.create!(passage: passages(:genesis_one_two), position: 2)
 
     patch curricula_positions_path(curriculum_id: curriculum.id),
-      params: { item_ids: [item2.id, item1.id] },
+      params: { item_ids: [ item2.id, item1.id ] },
       as: :json
 
     assert_response :ok
