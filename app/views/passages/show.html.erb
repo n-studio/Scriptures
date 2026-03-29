@@ -27,8 +27,7 @@
           <% selected = @selected_translations.include?(t) %>
           <%= link_to reading_path(corpus_slug: @corpus.slug, scripture_slug: @scripture.slug, division_number: @division.number, t: toggle_translation_params(t), parallel: params[:parallel], diff: params[:diff]),
                 class: "px-2 py-1 rounded-md font-medium transition-colors #{selected ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900' : 'text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-900'}",
-                title: "#{t.name} (#{t.edition_type || 'unclassified'})",
-                data: { turbo_action: "replace" } do %>
+                data: { turbo_action: "replace", tooltip: "#{t.name} (#{t.edition_type || 'unclassified'})" } do %>
             <%= t.abbreviation %><% if t.edition_type %><span class="ml-0.5 text-[8px] align-super <%= edition_type_color(t.edition_type) %>"><%= edition_type_badge(t.edition_type) %></span><% end %>
           <% end %>
         <% end %>
