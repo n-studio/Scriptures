@@ -21,8 +21,55 @@
     <% end %>
 
     <div class="sidebar__section">
-      <span class="sidebar__section-title"><%= t("admin.sidebar.resources", default: "Resources") %></span>
+      <span class="sidebar__section-title">Content</span>
     </div>
+
+    <%= link_to admin_traditions_path, class: "sidebar__link #{'sidebar__link--active' if controller_name == 'traditions'}" do %>
+      <span class="sidebar__text">Traditions</span>
+    <% end %>
+    <%= link_to admin_corpora_index_path, class: "sidebar__link #{'sidebar__link--active' if controller_name == 'corpora'}" do %>
+      <span class="sidebar__text">Corpora</span>
+    <% end %>
+    <%= link_to admin_scriptures_path, class: "sidebar__link #{'sidebar__link--active' if controller_name == 'scriptures'}" do %>
+      <span class="sidebar__text">Scriptures</span>
+    <% end %>
+    <%= link_to admin_translations_path, class: "sidebar__link #{'sidebar__link--active' if controller_name == 'translations'}" do %>
+      <span class="sidebar__text">Translations</span>
+    <% end %>
+
+    <div class="sidebar__section">
+      <span class="sidebar__section-title">Scholarship</span>
+    </div>
+
+    <%= link_to admin_commentaries_path, class: "sidebar__link #{'sidebar__link--active' if controller_name == 'commentaries'}" do %>
+      <span class="sidebar__text">Commentaries</span>
+    <% end %>
+    <%= link_to admin_source_documents_path, class: "sidebar__link #{'sidebar__link--active' if controller_name == 'source_documents'}" do %>
+      <span class="sidebar__text">Source Documents</span>
+    <% end %>
+    <%= link_to admin_lexicon_entries_path, class: "sidebar__link #{'sidebar__link--active' if controller_name == 'lexicon_entries'}" do %>
+      <span class="sidebar__text">Lexicon</span>
+    <% end %>
+    <%= link_to admin_manuscripts_path, class: "sidebar__link #{'sidebar__link--active' if controller_name == 'manuscripts'}" do %>
+      <span class="sidebar__text">Manuscripts</span>
+    <% end %>
+    <%= link_to admin_featured_passages_path, class: "sidebar__link #{'sidebar__link--active' if controller_name == 'featured_passages'}" do %>
+      <span class="sidebar__text">Featured Passages</span>
+    <% end %>
+
+    <div class="sidebar__section">
+      <span class="sidebar__section-title">Community</span>
+    </div>
+
+    <%= link_to admin_users_path, class: "sidebar__link #{'sidebar__link--active' if controller_name == 'users'}" do %>
+      <span class="sidebar__text">Users</span>
+    <% end %>
+    <%= link_to admin_groups_path, class: "sidebar__link #{'sidebar__link--active' if controller_name == 'groups'}" do %>
+      <span class="sidebar__text">Groups</span>
+    <% end %>
+    <%= link_to admin_annotations_path, class: "sidebar__link #{'sidebar__link--active' if controller_name == 'annotations'}" do %>
+      <span class="sidebar__text">Annotations</span>
+    <% end %>
 
     <!-- Generator: new sidebar links above -->
 

@@ -27,9 +27,9 @@ module Admin::ApplicationHelper
     when Date, Time, DateTime
       content_tag(:span, l(value, format: options[:format].presence || :long), class: "record-value-date")
     when true
-      content_tag(:span, I18n.t("admin.labels.yes_label"), class: class_names("record-value-tag", "record-value-tag--success"))
+      content_tag(:span, I18n.t("admin.labels.yes_label", default: "Yes"), class: class_names("record-value-tag", "record-value-tag--success"))
     when false
-      content_tag(:span, I18n.t("admin.labels.no_label"), class: class_names("record-value-tag", "record-value-tag--failure"))
+      content_tag(:span, I18n.t("admin.labels.no_label", default: "No"), class: class_names("record-value-tag", "record-value-tag--failure"))
     when ActiveRecord::Associations::CollectionProxy, ActiveRecord::Relation
       format_association_tags(value, limit: 2)
     when ActiveRecord::Base
@@ -368,9 +368,9 @@ module Admin::ApplicationHelper
       when Date, Time, DateTime
         value.to_formatted_s(:default)
       when true
-        content_tag(:span, I18n.t("admin.labels.yes_label"), class: class_names("record-value-tag", "record-value-tag--success"))
+        content_tag(:span, I18n.t("admin.labels.yes_label", default: "Yes"), class: class_names("record-value-tag", "record-value-tag--success"))
       when false
-        content_tag(:span, I18n.t("admin.labels.no_label"), class: class_names("record-value-tag", "record-value-tag--failure"))
+        content_tag(:span, I18n.t("admin.labels.no_label", default: "No"), class: class_names("record-value-tag", "record-value-tag--failure"))
       when Array
         value.join(", ")
       else

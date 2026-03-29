@@ -85,5 +85,23 @@ Rails.application.routes.draw do
   namespace :admin do
     root "dashboard#index"
     get "countries", to: "countries#index"
+
+    # Content
+    resources :traditions
+    resources :corpora
+    resources :scriptures
+    resources :translations
+
+    # Scholarship
+    resources :commentaries
+    resources :source_documents
+    resources :lexicon_entries
+    resources :manuscripts
+    resources :featured_passages
+
+    # Community
+    resources :users
+    resources :groups
+    resources :annotations
   end
 end

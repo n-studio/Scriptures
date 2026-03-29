@@ -1,13 +1,57 @@
 <div class="dashboard">
   <div class="dashboard__header">
-    <h1 class="dashboard__title"><%= t("admin.labels.dashboard", default: "Dashboard") %></h1>
+    <h1 class="dashboard__title">Dashboard</h1>
   </div>
 
   <%= render partial: "admin/application/notice", locals: { notice: } %>
   <%= render partial: "admin/application/alert", locals: { alert: } %>
 
-  <div class="dashboard__section">
-    <h2 class="dashboard__title"><%= t("admin.dashboard.labels.overview", default: "Overview") %></h2>
-    <p><%= t("admin.dashboard.empty_state", default: "Your admin dashboard is ready.") %></p>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+    <% @stats.each do |label, count| %>
+      <div class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+        <p class="text-2xl font-bold text-slate-900 dark:text-slate-100"><%= count %></p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1"><%= label.to_s.titleize %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-5">
+      <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-4">Recent Users</h2>
+      <% if @recent_users.any? %>
+        <div class="space-y-3">
+          <% @recent_users.each do |user| %>
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-slate-900 dark:text-slate-100"><%= user.display_name.presence || user.email %></p>
+                <p class="text-xs text-slate-500"><%= user.email %></p>
+              </div>
+              <span class="text-xs text-slate-400"><%= time_ago_in_words(user.created_at) %> ago</span>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-sm text-slate-500">No users yet.</p>
+      <% end %>
+    </div>
+
+    <div class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-5">
+      <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-4">Recent Annotations</h2>
+      <% if @recent_annotations.any? %>
+        <div class="space-y-3">
+          <% @recent_annotations.each do |ann| %>
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-xs font-medium text-slate-900 dark:text-slate-100"><%= ann.user.display_name.presence || ann.user.email %></span>
+                <span class="text-xs text-slate-400"><%= time_ago_in_words(ann.created_at) %> ago</span>
+              </div>
+              <p class="text-xs text-slate-600 dark:text-slate-400 line-clamp-2"><%= ann.body.truncate(120) %></p>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-sm text-slate-500">No annotations yet.</p>
+      <% end %>
+    </div>
   </div>
 </div>

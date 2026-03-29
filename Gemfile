@@ -36,6 +36,8 @@ gem "csv"
 gem "pagy"
 # Audit trail for model changes [https://github.com/paper-trail-gem/paper_trail]
 gem "paper_trail"
+# Money and currency handling [https://github.com/RubyMoney/money-rails]
+gem "money-rails"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
