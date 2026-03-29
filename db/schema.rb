@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_29_122553) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_29_140129) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -152,6 +152,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_122553) do
     t.datetime "updated_at", null: false
     t.index ["parent_id"], name: "index_divisions_on_parent_id"
     t.index ["scripture_id"], name: "index_divisions_on_scripture_id"
+  end
+
+  create_table "featured_passages", force: :cascade do |t|
+    t.date "active_from", null: false
+    t.date "active_until"
+    t.text "context", null: false
+    t.datetime "created_at", null: false
+    t.bigint "passage_id", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active_from"], name: "index_featured_passages_on_active_from"
+    t.index ["passage_id"], name: "index_featured_passages_on_passage_id"
   end
 
   create_table "group_activities", force: :cascade do |t|
@@ -348,6 +360,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_122553) do
     t.datetime "created_at", null: false
     t.bigint "passage_id", null: false
     t.datetime "read_at", null: false
+    t.integer "time_spent_seconds", default: 0, null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["passage_id"], name: "index_reading_progresses_on_passage_id"
@@ -464,6 +477,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_122553) do
   add_foreign_key "curriculum_items", "passages"
   add_foreign_key "divisions", "divisions", column: "parent_id"
   add_foreign_key "divisions", "scriptures"
+  add_foreign_key "featured_passages", "passages"
   add_foreign_key "group_activities", "groups"
   add_foreign_key "group_activities", "users"
   add_foreign_key "group_invitations", "groups"

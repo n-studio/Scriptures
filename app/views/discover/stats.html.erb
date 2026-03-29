@@ -1,0 +1,60 @@
+<div class="h-full overflow-y-auto px-4 md:px-8 py-8 md:py-12 max-w-4xl mx-auto w-full">
+  <div class="flex items-center gap-2 text-xs font-medium text-stone-500 uppercase tracking-widest mb-8">
+    <%= link_to "Discover", discover_path, class: "hover:text-stone-900 dark:hover:text-stone-100 transition-colors" %>
+    <%= chevron_right_icon %>
+    <span class="text-stone-900 dark:text-stone-100">Statistics</span>
+  </div>
+
+  <h1 class="font-bold text-2xl mb-8">Reading Statistics</h1>
+
+  <%# Summary cards %>
+  <div class="grid grid-cols-3 gap-4 mb-10">
+    <div class="p-5 border border-stone-200 dark:border-stone-800 rounded-xl text-center">
+      <div class="text-3xl font-bold"><%= @passages_read %></div>
+      <div class="text-xs text-stone-500 mt-1">Passages read</div>
+    </div>
+    <div class="p-5 border border-stone-200 dark:border-stone-800 rounded-xl text-center">
+      <div class="text-3xl font-bold"><%= @total_time / 60 %></div>
+      <div class="text-xs text-stone-500 mt-1">Minutes spent</div>
+    </div>
+    <div class="p-5 border border-stone-200 dark:border-stone-800 rounded-xl text-center">
+      <div class="text-3xl font-bold"><%= number_with_delimiter(@words_encountered) %></div>
+      <div class="text-xs text-stone-500 mt-1">Words encountered</div>
+    </div>
+  </div>
+
+  <%# 30-day activity chart %>
+  <h2 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-3">Last 30 days</h2>
+  <div class="flex items-end gap-1 h-24 mb-10">
+    <% 30.downto(0) do |i| %>
+      <% day = i.days.ago.to_date %>
+      <% count = @daily_counts[day] || 0 %>
+      <% max = @daily_counts.values.max || 1 %>
+      <% height = count > 0 ? [ (count.to_f / max * 100).round, 8 ].max : 2 %>
+      <div data-tooltip="<%= day.strftime('%b %d') %>: <%= count %>"
+           class="flex-1 rounded-sm transition-colors <%= count > 0 ? 'bg-blue-500' : 'bg-stone-200 dark:bg-stone-800' %>"
+           style="height: <%= height %>%"></div>
+    <% end %>
+  </div>
+
+  <%# Recent reading history %>
+  <h2 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-3">Recent</h2>
+  <% if @recent_reads.any? %>
+    <div class="space-y-2">
+      <% @recent_reads.each do |rp| %>
+        <% passage = rp.passage %>
+        <% scripture = passage.division.scripture %>
+        <% corpus = scripture.corpus %>
+        <div class="flex items-center justify-between py-2 border-b border-stone-100 dark:border-stone-900 last:border-0">
+          <%= link_to reading_path(corpus_slug: corpus.slug, scripture_slug: scripture.slug, division_number: passage.division.number),
+                class: "text-sm font-medium hover:text-blue-500 transition-colors" do %>
+            <%= scripture.name %> <%= passage.division.number %>:<%= passage.number %>
+          <% end %>
+          <span class="text-xs text-stone-400"><%= time_ago_in_words(rp.read_at) %> ago</span>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-stone-500 text-sm">No reading history yet.</p>
+  <% end %>
+</div>

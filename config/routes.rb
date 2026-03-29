@@ -64,6 +64,7 @@ Rails.application.routes.draw do
     end
   end
   resources :reading_progresses, only: :create
+  post "reading_progresses/time", to: "reading_progresses#time", as: :reading_progress_time
   delete "reading_progress", to: "reading_progresses#destroy", as: :reading_progress
 
   # Study tools
@@ -75,6 +76,12 @@ Rails.application.routes.draw do
   # Export (collection route must come before passages to avoid slug matching)
   get "export/collection/:id", to: "exports#collection", as: :export_collection
   get "export/:corpus_slug/:scripture_slug", to: "exports#passages", as: :export_passages
+
+  # Discovery & statistics
+  get "discover", to: "discover#index", as: :discover
+  get "stats", to: "discover#stats", as: :stats
+  get "word_frequency", to: "discover#word_frequency", as: :word_frequency
+  get "exploration", to: "discover#exploration", as: :exploration
 
   # Search & jump-to-reference
   get "search", to: "search#index", as: :search

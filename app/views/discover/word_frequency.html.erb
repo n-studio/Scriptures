@@ -1,0 +1,44 @@
+<div class="h-full overflow-y-auto px-4 md:px-8 py-8 md:py-12 max-w-4xl mx-auto w-full">
+  <div class="flex items-center gap-2 text-xs font-medium text-stone-500 uppercase tracking-widest mb-8">
+    <%= link_to "Discover", discover_path, class: "hover:text-stone-900 dark:hover:text-stone-100 transition-colors" %>
+    <%= chevron_right_icon %>
+    <span class="text-stone-900 dark:text-stone-100">Word Frequency</span>
+  </div>
+
+  <div class="flex items-center justify-between mb-8">
+    <h1 class="font-bold text-2xl">Word Frequency</h1>
+    <div class="flex items-center gap-2 text-xs">
+      <% @corpora.each do |c| %>
+        <%= link_to c.name, word_frequency_path(corpus_slug: c.slug),
+              class: "px-2 py-1 rounded-md font-medium transition-colors #{c == @corpus ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900' : 'text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-900'}" %>
+      <% end %>
+    </div>
+  </div>
+
+  <p class="text-sm text-stone-500 mb-6">Top 100 lemmas in <strong><%= @corpus.name %></strong> by occurrence count.</p>
+
+  <% if @frequencies.any? %>
+    <% max_count = @frequencies.first[1] %>
+    <div class="space-y-1.5">
+      <% @frequencies.each_with_index do |(lemma, count), i| %>
+        <div class="flex items-center gap-3">
+          <span class="text-xs text-stone-400 font-mono w-6 text-right"><%= i + 1 %></span>
+          <div class="flex-1">
+            <div class="flex items-center gap-2">
+              <%= link_to search_path(q: lemma, mode: "lemma"),
+                    class: "text-sm font-medium font-serif hover:text-blue-500 transition-colors" do %>
+                <%= lemma %>
+              <% end %>
+              <span class="text-[10px] text-stone-400"><%= number_with_delimiter(count) %></span>
+            </div>
+            <div class="h-1 bg-stone-100 dark:bg-stone-800 rounded-full mt-1 overflow-hidden">
+              <div class="h-full bg-blue-500 rounded-full" style="width: <%= (count.to_f / max_count * 100).round %>%"></div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-stone-500 text-sm">No original language tokens found for this corpus.</p>
+  <% end %>
+</div>

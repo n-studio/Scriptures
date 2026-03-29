@@ -1,0 +1,53 @@
+<div class="h-full overflow-y-auto px-4 md:px-8 py-8 md:py-12 max-w-5xl mx-auto w-full">
+  <div class="flex items-center gap-2 text-xs font-medium text-stone-500 uppercase tracking-widest mb-8">
+    <%= link_to "Discover", discover_path, class: "hover:text-stone-900 dark:hover:text-stone-100 transition-colors" %>
+    <%= chevron_right_icon %>
+    <span class="text-stone-900 dark:text-stone-100">Exploration Map</span>
+  </div>
+
+  <h1 class="font-bold text-2xl mb-2">Exploration Map</h1>
+  <p class="text-sm text-stone-500 mb-8">Your reading coverage across all corpora. Each cell is a chapter — darker means more coverage.</p>
+
+  <% @corpora.each do |corpus| %>
+    <% scriptures = corpus.scriptures.select { |s| s.divisions.any? } %>
+    <% next if scriptures.empty? %>
+
+    <div class="mb-8">
+      <h2 class="font-bold text-sm mb-3"><%= corpus.name %></h2>
+      <div class="space-y-2">
+        <% scriptures.each do |scripture| %>
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-stone-500 w-24 truncate shrink-0" data-tooltip="<%= scripture.name %>"><%= scripture.name %></span>
+            <div class="flex gap-0.5 flex-wrap">
+              <% scripture.divisions.sort_by(&:position).each do |division| %>
+                <% cov = @coverage[division.id] || { read: 0, total: 0, pct: 0 } %>
+                <% color = case cov[:pct]
+                   when 0 then "bg-stone-100 dark:bg-stone-800"
+                   when 1..25 then "bg-blue-200 dark:bg-blue-900"
+                   when 26..50 then "bg-blue-300 dark:bg-blue-800"
+                   when 51..75 then "bg-blue-400 dark:bg-blue-700"
+                   when 76..99 then "bg-blue-500 dark:bg-blue-600"
+                   else "bg-blue-600 dark:bg-blue-500"
+                   end %>
+                <%= link_to reading_path(corpus_slug: corpus.slug, scripture_slug: scripture.slug, division_number: division.number),
+                      class: "w-5 h-5 rounded-sm #{color} transition-colors hover:ring-2 hover:ring-blue-400",
+                      data: { tooltip: "#{scripture.name} #{division.number} — #{cov[:read]}/#{cov[:total]} (#{cov[:pct]}%)" } do %>
+                  <span class="sr-only"><%= division.number %></span>
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <%# Legend %>
+  <div class="flex items-center gap-4 text-[10px] text-stone-500 mt-4">
+    <span>Coverage:</span>
+    <div class="flex items-center gap-1"><div class="w-3 h-3 rounded-sm bg-stone-100 dark:bg-stone-800"></div> 0%</div>
+    <div class="flex items-center gap-1"><div class="w-3 h-3 rounded-sm bg-blue-200 dark:bg-blue-900"></div> 1-25%</div>
+    <div class="flex items-center gap-1"><div class="w-3 h-3 rounded-sm bg-blue-400 dark:bg-blue-700"></div> 26-75%</div>
+    <div class="flex items-center gap-1"><div class="w-3 h-3 rounded-sm bg-blue-600 dark:bg-blue-500"></div> 100%</div>
+  </div>
+</div>

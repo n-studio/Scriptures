@@ -1,0 +1,48 @@
+<div class="h-full overflow-y-auto px-4 md:px-8 py-8 md:py-12 max-w-4xl mx-auto w-full">
+  <h1 class="font-bold text-2xl mb-8">Discover</h1>
+
+  <%# Featured passage %>
+  <% if @featured %>
+    <div class="mb-10 p-6 border border-stone-200 dark:border-stone-800 rounded-2xl bg-white dark:bg-stone-900/50">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300">Featured</span>
+        <span class="text-[10px] text-stone-400"><%= @featured.active_from.strftime("%B %d, %Y") %></span>
+      </div>
+      <h2 class="font-serif text-xl mb-2"><%= @featured.title %></h2>
+      <% if @featured_text %>
+        <blockquote class="font-serif text-lg text-stone-600 dark:text-stone-400 border-l-2 border-amber-400 pl-4 mb-3 italic">
+          <%= @featured_text %>
+        </blockquote>
+        <p class="text-xs text-stone-400 mb-3">
+          <%= @featured_scripture.name %> <%= @featured_passage.division.number %>:<%= @featured_passage.number %>
+          (<%= @featured_translation.abbreviation %>)
+        </p>
+      <% end %>
+      <p class="text-sm text-stone-600 dark:text-stone-400 leading-relaxed"><%= @featured.context %></p>
+      <%= link_to "Read in context", reading_path(corpus_slug: @featured_corpus.slug, scripture_slug: @featured_scripture.slug, division_number: @featured_passage.division.number),
+            class: "inline-block mt-3 text-sm text-blue-600 dark:text-blue-400 hover:underline" %>
+    </div>
+  <% end %>
+
+  <%# Quick links %>
+  <div class="grid md:grid-cols-3 gap-4">
+    <% if authenticated? %>
+      <%= link_to stats_path, class: "p-5 border border-stone-200 dark:border-stone-800 rounded-xl hover:border-stone-400 dark:hover:border-stone-600 transition-colors" do %>
+        <h3 class="font-bold text-sm mb-1">Reading Statistics</h3>
+        <p class="text-xs text-stone-500">Passages read, time spent, and words encountered.</p>
+      <% end %>
+    <% end %>
+
+    <%= link_to word_frequency_path, class: "p-5 border border-stone-200 dark:border-stone-800 rounded-xl hover:border-stone-400 dark:hover:border-stone-600 transition-colors" do %>
+      <h3 class="font-bold text-sm mb-1">Word Frequency</h3>
+      <p class="text-xs text-stone-500">Most common words in the original languages.</p>
+    <% end %>
+
+    <% if authenticated? %>
+      <%= link_to exploration_path, class: "p-5 border border-stone-200 dark:border-stone-800 rounded-xl hover:border-stone-400 dark:hover:border-stone-600 transition-colors" do %>
+        <h3 class="font-bold text-sm mb-1">Exploration Map</h3>
+        <p class="text-xs text-stone-500">Visual overview of your reading coverage.</p>
+      <% end %>
+    <% end %>
+  </div>
+</div>
