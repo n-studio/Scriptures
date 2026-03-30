@@ -1,18 +1,18 @@
 @utility liquid-glass-btn {
   @apply inline-flex items-center justify-center px-6 py-4 text-sm font-medium rounded-full transition-all duration-300 cursor-pointer;
-  @apply bg-white/5 dark:bg-black/20 text-white/90 dark:text-white/95;
+  @apply bg-white/5 dark:bg-black/20 text-stone-800/90 dark:text-stone-100/95;
   @apply backdrop-blur-sm;
   @apply border-0 appearance-none no-underline select-none outline-none;
   @apply transform hover:scale-105 active:scale-95;
-  @apply focus:ring-2 focus:ring-offset-2 focus:ring-white/50;
+  @apply focus:ring-2 focus:ring-offset-2 focus:ring-stone-400/50;
 
   /* Vendor-specific fallback */
   -webkit-backdrop-filter: blur(4px);
   -webkit-tap-highlight-color: transparent;
 
-  /* Glass morphism shadows - dark mode values overridden below */
-  --shadow-inset: rgba(255, 255, 255, 0.3);
-  --shadow-outer: rgba(0, 0, 0, 0.1);
+  /* Glass morphism shadows - warm stone tones */
+  --shadow-inset: rgba(245, 245, 244, 0.3);
+  --shadow-outer: rgba(28, 25, 23, 0.1);
 
   box-shadow:
     inset 2px 2px 1px 0 var(--shadow-inset),
@@ -23,8 +23,8 @@
 
 /* Dark mode shadow overrides */
 .dark .liquid-glass-btn {
-  --shadow-inset: rgba(255, 255, 255, 0.1);
-  --shadow-outer: rgba(0, 0, 0, 0.4);
+  --shadow-inset: rgba(245, 245, 244, 0.1);
+  --shadow-outer: rgba(28, 25, 23, 0.4);
 }
 
 /* Optional size variants */
