@@ -2,7 +2,8 @@ module PasskeyCredentials
   class AuthenticationsController < ApplicationController
     def create
       webauthn_credential = WebAuthn::Credential.from_get(params[:credential])
-      stored = PasskeyCredential.find_by!(external_id: webauthn_credential.id)
+      stored = PasskeyCredential.find_by(external_id: webauthn_credential.id)
+      raise ActiveRecord::RecordNotFound, "Passkey not recognized. It may have been removed — try signing in with another method." unless stored
 
       webauthn_credential.verify(
         session.delete(:webauthn_authenticate_challenge),

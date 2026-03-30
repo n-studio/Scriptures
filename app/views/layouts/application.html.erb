@@ -64,7 +64,7 @@
       </aside>
 
       <%# Main Content %>
-      <main class="flex-1 flex flex-col overflow-hidden relative">
+      <main class="flex-1 flex flex-col min-h-0 relative">
         <%# Top Header %>
         <header class="h-16 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between px-4 md:px-8 bg-white/50 dark:bg-stone-950/50 backdrop-blur-md z-30 shrink-0">
           <div class="flex items-center gap-2 md:gap-4 flex-1">
@@ -82,9 +82,29 @@
           </div>
           <div class="flex items-center gap-2">
             <% if authenticated? %>
-              <%= link_to account_path, class: "p-2 hover:bg-stone-100 dark:hover:bg-stone-900 rounded-lg transition-colors text-stone-500 hover:text-stone-900 dark:hover:text-stone-100" do %>
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5.99 5.99 0 00-4.793 2.39A6.483 6.483 0 0010 16.5a6.483 6.483 0 004.793-2.11A5.99 5.99 0 0010 12z" clip-rule="evenodd" /></svg>
-              <% end %>
+              <div data-controller="dropdown" class="relative">
+                <button data-action="dropdown#toggle"
+                        class="p-2 hover:bg-stone-100 dark:hover:bg-stone-900 rounded-lg transition-colors text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 cursor-pointer">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5.99 5.99 0 00-4.793 2.39A6.483 6.483 0 0010 16.5a6.483 6.483 0 004.793-2.11A5.99 5.99 0 0010 12z" clip-rule="evenodd" /></svg>
+                </button>
+                <div data-dropdown-target="menu" class="hidden fixed w-52 bg-white dark:bg-stone-950 border border-stone-200 dark:border-stone-800 shadow-lg p-1.5 z-100">
+                  <% if current_user.admin? %>
+                    <%= link_to admin_root_path, class: "w-full flex items-center gap-3 px-3 py-2.5 text-stone-500 hover:bg-stone-50 dark:hover:bg-stone-900/50 hover:text-stone-900 dark:hover:text-stone-100 transition-all cursor-pointer" do %>
+                      <span class="shrink-0"><%= shield_icon %></span>
+                      <span class="text-sm font-medium">Admin</span>
+                    <% end %>
+                  <% end %>
+                  <%= link_to account_path, class: "w-full flex items-center gap-3 px-3 py-2.5 text-stone-500 hover:bg-stone-50 dark:hover:bg-stone-900/50 hover:text-stone-900 dark:hover:text-stone-100 transition-all cursor-pointer" do %>
+                    <span class="shrink-0"><%= settings_icon %></span>
+                    <span class="text-sm font-medium">Settings</span>
+                  <% end %>
+                  <div class="my-1 mx-3 border-t border-stone-100 dark:border-stone-900"></div>
+                  <%= button_to session_path, method: :delete, class: "w-full flex items-center gap-3 px-3 py-2.5 text-stone-500 hover:bg-stone-50 dark:hover:bg-stone-900/50 hover:text-stone-900 dark:hover:text-stone-100 transition-all cursor-pointer" do %>
+                    <span class="shrink-0"><%= log_out_icon %></span>
+                    <span class="text-sm font-medium">Sign out</span>
+                  <% end %>
+                </div>
+              </div>
             <% else %>
               <%= link_to "Sign in", new_session_path, class: "text-sm text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 transition-colors" %>
             <% end %>
