@@ -25,10 +25,15 @@
         <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-3"><%= category_labels[category] || category.to_s.titleize %></h2>
         <div class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 divide-y divide-slate-200 dark:divide-slate-700">
           <% importers.each do |importer| %>
+            <% run = importer[:latest_run] %>
             <div class="flex items-center justify-between px-5 py-4">
               <div class="flex items-center gap-3">
-                <% if importer[:imported] %>
-                  <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0" title="Imported"></span>
+                <% if run&.running? %>
+                  <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse shrink-0" title="Running"></span>
+                <% elsif run&.completed? %>
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0" title="Completed"></span>
+                <% elsif run&.failed? %>
+                  <span class="w-2 h-2 rounded-full bg-red-500 shrink-0" title="Failed"></span>
                 <% elsif importer[:files_present] %>
                   <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0" title="Source files present, not yet imported"></span>
                 <% else %>
@@ -37,16 +42,36 @@
                 <div>
                   <p class="text-sm font-medium text-slate-900 dark:text-slate-100">
                     <%= importer[:name] %>
-                    <% if importer[:imported] %>
-                      <span class="ml-1.5 text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Imported</span>
+                    <% if run&.running? %>
+                      <span class="ml-1.5 text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">Running</span>
+                    <% elsif run&.completed? %>
+                      <span class="ml-1.5 text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Completed</span>
+                    <% elsif run&.failed? %>
+                      <span class="ml-1.5 text-[10px] font-bold uppercase tracking-widest text-red-600 dark:text-red-400">Failed</span>
                     <% end %>
                   </p>
-                  <p class="text-xs text-slate-500 dark:text-slate-400"><%= importer[:description] %></p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">
+                    <%= importer[:description] %>
+                  </p>
+                  <% if run&.completed? || run&.failed? %>
+                    <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
+                      <% if run.completed? && run.records_count&.positive? %>
+                        <%= number_with_delimiter(run.records_count) %> records &middot;
+                      <% end %>
+                      <%= time_ago_in_words(run.completed_at) %> ago
+                      <% if run.duration %>
+                        &middot; took <%= distance_of_time_in_words(run.duration) %>
+                      <% end %>
+                    </p>
+                  <% end %>
+                  <% if run&.failed? && run.error_message.present? %>
+                    <p class="text-[11px] text-red-500 dark:text-red-400 mt-0.5 line-clamp-1"><%= run.error_message %></p>
+                  <% end %>
                 </div>
               </div>
-              <%= button_to importer[:imported] ? "Re-import" : "Run", admin_imports_run_path(key: importer[:key]), method: :post,
-                    disabled: !importer[:files_present],
-                    class: "px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer #{importer[:files_present] ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200' : 'bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed'}" %>
+              <%= button_to run&.completed? ? "Re-import" : "Run", admin_imports_run_path(key: importer[:key]), method: :post,
+                    disabled: !importer[:files_present] || run&.running?,
+                    class: "px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer shrink-0 #{importer[:files_present] && !run&.running? ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200' : 'bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed'}" %>
             </div>
           <% end %>
         </div>

@@ -1,7 +1,23 @@
 class RunImportJob < ApplicationJob
   queue_as :default
 
-  def perform(key)
+  def perform(key, import_run: nil)
+    import_run ||= ImportRun.create!(key: key)
+    import_run.update!(status: "running", started_at: Time.current)
+
+    count_before = total_record_count
+    run_importer(key)
+    records_created = total_record_count - count_before
+
+    import_run.update!(status: "completed", completed_at: Time.current, records_count: records_created)
+  rescue => e
+    import_run&.update!(status: "failed", completed_at: Time.current, error_message: e.message)
+    raise
+  end
+
+  private
+
+  def run_importer(key)
     case key
     when "all"           then run_all
     # Bible translations from scrollmapper JSON format
@@ -32,8 +48,6 @@ class RunImportJob < ApplicationJob
     else raise ArgumentError, "Unknown importer: #{key}"
     end
   end
-
-  private
 
   def source(path)
     Rails.root.join("db/seeds/sources", path)
@@ -70,7 +84,10 @@ class RunImportJob < ApplicationJob
       quran_arabic quran_sahih quran_yusufali quran_pickthall tafsir
       sblgnt suttacentral hadith dead_sea_scrolls
       strongs_hebrew strongs_greek classify_translations
-    ].each { |key| perform(key) }
+    ].each do |sub_key|
+      sub_run = ImportRun.create!(key: sub_key)
+      perform(sub_key, import_run: sub_run)
+    end
   end
 
   # Classify translations by edition type (critical, devotional, original)
@@ -93,5 +110,9 @@ class RunImportJob < ApplicationJob
 
     # DSS scroll transcriptions are original texts
     Translation.where(edition_type: nil).joins(:corpus).where(corpora: { slug: "dead-sea-scrolls" }).update_all(edition_type: "original")
+  end
+
+  def total_record_count
+    PassageTranslation.count + Commentary.count + LexiconEntry.count + OriginalLanguageToken.count
   end
 end
