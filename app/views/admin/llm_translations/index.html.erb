@@ -1,0 +1,84 @@
+<div class="dashboard">
+  <div class="dashboard__header">
+    <h1 class="dashboard__title">LLM Translations</h1>
+  </div>
+
+  <%= render partial: "admin/application/notice", locals: { notice: } %>
+  <%= render partial: "admin/application/alert", locals: { alert: } %>
+
+  <% if @scripture %>
+    <%# === Chapter list for a scripture === %>
+    <nav class="text-sm text-slate-500 dark:text-slate-400 mb-6 flex items-center gap-1.5">
+      <%= link_to "Corpora", admin_llm_translations_path, class: "hover:text-slate-900 dark:hover:text-slate-100" %>
+      <span>/</span>
+      <%= link_to @corpus.name, admin_llm_translations_path(corpus_id: @corpus.id), class: "hover:text-slate-900 dark:hover:text-slate-100" %>
+      <span>/</span>
+      <span class="text-slate-900 dark:text-slate-100 font-medium"><%= @scripture.name %></span>
+    </nav>
+
+    <div class="flex gap-2 mb-6">
+      <% LlmTranslationJob::STYLES.each do |key, config| %>
+        <%= link_to config[:name_suffix],
+              admin_llm_translations_path(scripture_id: @scripture.id, style: key),
+              class: "px-3 py-1.5 text-xs font-medium rounded-md transition-colors #{@style == key ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'}" %>
+      <% end %>
+    </div>
+
+    <div class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 divide-y divide-slate-200 dark:divide-slate-700">
+      <% @divisions.each do |division| %>
+        <% total = @completion[:total][division.id] || 0 %>
+        <% translated = @completion[:translated][division.id] || 0 %>
+        <% pct = total > 0 ? (translated.to_f / total * 100).round : 0 %>
+        <%= link_to admin_llm_translation_path(division, style: @style),
+              class: "flex items-center justify-between px-5 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors" do %>
+          <div class="flex items-center gap-3">
+            <% if pct == 100 %>
+              <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+            <% elsif pct > 0 %>
+              <span class="w-2 h-2 rounded-full bg-blue-500 shrink-0"></span>
+            <% else %>
+              <span class="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600 shrink-0"></span>
+            <% end %>
+            <span class="text-sm font-medium text-slate-900 dark:text-slate-100"><%= division.display_name %></span>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="w-24 h-1.5 bg-slate-200 dark:bg-slate-600 rounded-full overflow-hidden">
+              <div class="h-full rounded-full transition-all <%= pct == 100 ? 'bg-emerald-500' : 'bg-blue-500' %>" style="width: <%= pct %>%"></div>
+            </div>
+            <span class="text-[11px] text-slate-400 dark:text-slate-500 w-16 text-right"><%= translated %>/<%= total %></span>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+  <% elsif @corpus %>
+    <%# === Scripture list for a corpus === %>
+    <nav class="text-sm text-slate-500 dark:text-slate-400 mb-6 flex items-center gap-1.5">
+      <%= link_to "Corpora", admin_llm_translations_path, class: "hover:text-slate-900 dark:hover:text-slate-100" %>
+      <span>/</span>
+      <span class="text-slate-900 dark:text-slate-100 font-medium"><%= @corpus.name %></span>
+    </nav>
+
+    <div class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 divide-y divide-slate-200 dark:divide-slate-700">
+      <% @scriptures.each do |scripture| %>
+        <%= link_to admin_llm_translations_path(scripture_id: scripture.id),
+              class: "flex items-center justify-between px-5 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors" do %>
+          <span class="text-sm font-medium text-slate-900 dark:text-slate-100"><%= scripture.name %></span>
+          <span class="text-xs text-slate-400 dark:text-slate-500"><%= scripture.divisions.where(parent_id: nil).count %> chapters</span>
+        <% end %>
+      <% end %>
+    </div>
+
+  <% else %>
+    <%# === Corpus list === %>
+    <div class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 divide-y divide-slate-200 dark:divide-slate-700">
+      <% @corpora.each do |corpus| %>
+        <%= link_to admin_llm_translations_path(corpus_id: corpus.id),
+              class: "flex items-center justify-between px-5 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors" do %>
+          <span class="text-sm font-medium text-slate-900 dark:text-slate-100"><%= corpus.name %></span>
+          <span class="text-xs text-slate-400 dark:text-slate-500"><%= corpus.scriptures.count %> scriptures</span>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

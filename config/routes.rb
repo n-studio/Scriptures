@@ -98,6 +98,14 @@ Rails.application.routes.draw do
     resources :groups
     resources :annotations
 
+    # LLM Translations
+    resources :llm_translations, only: [ :index, :show ] do
+      collection do
+        post :translate
+        patch :save_passage
+      end
+    end
+
     # Imports
     get "imports", to: "imports#index", as: :imports
     post "imports/download", to: "imports#download", as: :imports_download

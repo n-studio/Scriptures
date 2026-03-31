@@ -23,5 +23,10 @@ module Scriptures
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # LLM provider API keys (ENV takes precedence over credentials)
+    config.x.anthropic_api_key = ENV["ANTHROPIC_API_KEY"] || credentials.dig(:anthropic, :api_key)
+    # https://platform.openai.com/api-keys
+    config.x.openai_api_key = ENV["OPENAI_API_KEY"] || credentials.dig(:openai, :api_key)
   end
 end
