@@ -79,6 +79,12 @@ namespace :import do
     Import::Hadith.new(file: Rails.root.join(file)).run
   end
 
+  desc "Import Sira (prophetic biography) from Internet Archive DjVu text"
+  task :sira, [ :file ] => :environment do |_t, args|
+    file = args[:file] || "db/seeds/sources/sira/sirat_ibn_hisham.txt"
+    Import::Sira.new(file: Rails.root.join(file)).run
+  end
+
   desc "Import all available source data"
   task all: :environment do
     Rake::Task["import:download"].invoke

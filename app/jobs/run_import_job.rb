@@ -40,6 +40,8 @@ class RunImportJob < ApplicationJob
     when "hadith"        then run_hadith
     # Dead Sea Scrolls from BiblicalDSS JSON
     when "dead_sea_scrolls" then Import::DeadSeaScrolls.new(file: source("biblical_dss.json")).run
+    # Sira (prophetic biography) from Internet Archive DjVu text
+    when "sira" then Import::Sira.new(file: source("sira/sirat_ibn_hisham.txt")).run
     # Strong's lexicon from OpenScriptures JS format
     when "strongs_hebrew" then Import::StrongsLexicon.new(file: source("strongs_hebrew.js"), language: "Hebrew").run
     when "strongs_greek" then Import::StrongsLexicon.new(file: source("strongs_greek.js"), language: "Greek").run
@@ -82,7 +84,7 @@ class RunImportJob < ApplicationJob
     %w[
       bible_kjv bible_asv bible_ylt bible_darby
       quran_arabic quran_sahih quran_yusufali quran_pickthall tafsir
-      sblgnt suttacentral hadith dead_sea_scrolls
+      sblgnt suttacentral hadith sira dead_sea_scrolls
       strongs_hebrew strongs_greek classify_translations
     ].each do |sub_key|
       sub_run = ImportRun.create!(key: sub_key)
@@ -101,7 +103,8 @@ class RunImportJob < ApplicationJob
       # Devotional translations
       "KJV" => "devotional", "YLT" => "devotional", "DBY" => "devotional",
       "SAH" => "devotional", "YAL" => "devotional", "PKT" => "devotional", "SUJ" => "devotional",
-      "HEN" => "devotional"
+      "HEN" => "devotional",
+      "SEN" => "devotional"
     }
 
     classifications.each do |abbr, type|

@@ -62,8 +62,16 @@ class DownloadSourcesJob < ApplicationJob
       "hadith/shamail_muhammadiyah.json" => "#{hadith_base}/other_books/shamail_muhammadiyah.json"
     }
 
+    # Sira (prophetic biography) — Abdus-Salam M. Harun abridgement of Ibn Hisham's
+    # recension of Ibn Ishaq's Sirat Rasul Allah. Original Arabic text is public domain
+    # (9th century); English translation copyright status unclear.
+    sira_downloads = {
+      "sira/sirat_ibn_hisham.txt" => "https://archive.org/download/SiratIbnHishamBiographyOfTheProphet/Sirat%20Ibn%20Hisham%20-%20Biography%20of%20the%20Prophet_djvu.txt"
+    }
+
     sources_dir.join("hadith").mkpath
-    download_files(sources_dir, downloads.merge(hadith_downloads))
+    sources_dir.join("sira").mkpath
+    download_files(sources_dir, downloads.merge(hadith_downloads).merge(sira_downloads))
 
     # morphgnt/sblgnt — SBLGNT text: SBLGNT EULA; morphological annotations: CC BY-SA 3.0
     sblgnt_dir = sources_dir.join("sblgnt")

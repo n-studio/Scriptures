@@ -103,7 +103,7 @@ Rails.application.routes.draw do
     post "imports/download", to: "imports#download", as: :imports_download
     post "imports/run", to: "imports#run", as: :imports_run
     post "imports/run_all", to: "imports#run_all", as: :imports_run_all
-    resources :import_runs, only: [:index, :show, :destroy]
+    resources :import_runs, only: [ :index, :show, :destroy ]
   end
 
   # Canonical passage URLs: /bible/genesis/1

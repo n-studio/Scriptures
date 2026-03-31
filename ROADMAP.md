@@ -45,7 +45,7 @@ Prioritise critical editions and scholarly sources over devotional translations:
 
 **Hadith**
 - [x] Hadith collections (AhmedBaset/hadith-json) — 17 collections imported: 9 major books (Bukhari, Muslim, Abu Dawud, Tirmidhi, Nasa'i, Ibn Majah, Malik, Ahmad, Darimi), 3 forty-hadith compilations (Nawawi, Qudsi, Shah Waliullah), 5 supplementary books (Al-Adab Al-Mufrad, Bulugh Al-Maram, Mishkat Al-Masabih, Riyad As-Salihin, Shamail Muhammadiyah) — ~50,884 hadiths, Arabic + English
-- [ ] Sira (biography of the Prophet) — Ibn Ishaq/Ibn Hisham's Sirat Rasul Allah (Guillaume translation on Internet Archive, copyright status unclear)
+- [x] Sira (biography of the Prophet) — Ibn Ishaq/Ibn Hisham's Sirat Rasul Allah, Abdus-Salam M. Harun abridgement from Internet Archive DjVu text (copyright status unclear; original Arabic 9th century is public domain)
 - [x] Tafsir (Quranic exegesis) — Ibn Kathir (English), Al-Jalalayn (English), Al-Tabari (Arabic) imported as Commentary records linked to Quran passages via spa5k/tafsir_api (27 editions available, 3 imported initially)
 - [ ] Fiqh texts — OpenITI corpus has 776 fiqh texts (255M words), needs format investigation
 
@@ -55,7 +55,7 @@ Prioritise critical editions and scholarly sources over devotional translations:
 **Other traditions**
 - [ ] Identify reliable public domain sources for each corpus listed in the README
 - [ ] Prefer critical editions with manuscript notes over popular devotional editions
-- [x] Write an importer rake task per source format — bible_json, quran_tanzil, sblgnt, strongs, suttacentral, hadith, tafsir
+- [x] Write an importer rake task per source format — bible_json, quran_tanzil, sblgnt, strongs, suttacentral, hadith, tafsir, sira
 
 ### 1.3 Import pipeline
 
