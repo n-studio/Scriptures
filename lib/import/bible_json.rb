@@ -11,11 +11,12 @@ module Import
       Hebrews James 1\ Peter 2\ Peter 1\ John 2\ John 3\ John Jude Revelation
     ]).freeze
 
-    def initialize(file:, abbreviation:, name:, language:)
+    def initialize(file:, abbreviation:, name:, language:, progress: nil)
       @file = file
       @abbreviation = abbreviation
       @name = name
       @language = language
+      @progress = progress
     end
 
     def run
@@ -29,6 +30,8 @@ module Import
       translation_nt = ensure_translation(@nt_corpus)
 
       total_passages = 0
+
+      @progress&.call(0, books.size)
 
       books.each_with_index do |book, book_index|
         book_name = book["name"]
@@ -66,7 +69,7 @@ module Import
           end
         end
 
-        print "."
+        @progress&.call(book_index + 1, books.size)
       end
 
       puts "\n  #{@abbreviation}: #{total_passages} passage translations imported"

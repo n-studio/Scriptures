@@ -2,9 +2,10 @@ require "json"
 
 module Import
   class StrongsLexicon
-    def initialize(file:, language:)
+    def initialize(file:, language:, progress: nil)
       @file = file
       @language = language
+      @progress = progress
     end
 
     def run
@@ -19,7 +20,9 @@ module Import
 
       total = 0
 
-      data.each do |strongs_number, entry|
+      @progress&.call(0, data.size)
+
+      data.each_with_index do |(strongs_number, entry), idx|
         LexiconEntry.find_or_create_by!(strongs_number: strongs_number) do |le|
           le.lemma = entry["lemma"] || ""
           le.language = @language
@@ -32,7 +35,9 @@ module Import
         end
 
         total += 1
+        @progress&.call(idx + 1, data.size) if (idx + 1) % 500 == 0
       end
+      @progress&.call(data.size, data.size)
 
       puts "  #{@language}: #{total} lexicon entries imported"
     end

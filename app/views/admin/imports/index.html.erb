@@ -1,23 +1,15 @@
 <div class="dashboard">
   <div class="dashboard__header flex items-center justify-between">
     <h1 class="dashboard__title">Import Data</h1>
-    <div class="flex items-center gap-3">
-      <%= button_to "Download Sources", admin_imports_download_path, method: :post,
-            class: "px-4 py-2 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer" %>
-      <%= button_to "Import All", admin_imports_run_all_path, method: :post,
-            class: "px-4 py-2 text-sm font-medium rounded-lg bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors cursor-pointer" %>
-    </div>
+    <%= button_to "Import All", admin_imports_run_all_path, method: :post,
+          class: "px-4 py-2 text-sm font-medium rounded-lg bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors cursor-pointer" %>
   </div>
 
   <%= render partial: "admin/application/notice", locals: { notice: } %>
   <%= render partial: "admin/application/alert", locals: { alert: } %>
 
-  <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">
-    Source files directory: <code class="text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded"><%= @sources_dir %></code>
-  </p>
-
   <% categories = @importers.group_by { |i| i[:category] } %>
-  <% category_labels = { bible: "Bible & DSS", quran: "Quran & Islamic", islamic: "Islamic", pali: "Pali Canon", lexicon: "Lexicon", maintenance: "Maintenance" } %>
+  <% category_labels = { bible: "Bible & DSS", quran: "Quran & Islamic", pali: "Pali Canon", lexicon: "Lexicon", maintenance: "Maintenance" } %>
 
   <div class="space-y-8">
     <% categories.each do |category, importers| %>
@@ -34,10 +26,10 @@
                   <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0" title="Completed"></span>
                 <% elsif run&.failed? %>
                   <span class="w-2 h-2 rounded-full bg-red-500 shrink-0" title="Failed"></span>
-                <% elsif importer[:files_present] %>
-                  <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0" title="Source files present, not yet imported"></span>
+                <% elsif run&.cancelled? %>
+                  <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0" title="Cancelled"></span>
                 <% else %>
-                  <span class="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600 shrink-0" title="Source files missing"></span>
+                  <span class="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600 shrink-0" title="Not yet imported"></span>
                 <% end %>
                 <div>
                   <p class="text-sm font-medium text-slate-900 dark:text-slate-100">
@@ -48,14 +40,16 @@
                       <span class="ml-1.5 text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Completed</span>
                     <% elsif run&.failed? %>
                       <span class="ml-1.5 text-[10px] font-bold uppercase tracking-widest text-red-600 dark:text-red-400">Failed</span>
+                    <% elsif run&.cancelled? %>
+                      <span class="ml-1.5 text-[10px] font-bold uppercase tracking-widest text-amber-600 dark:text-amber-400">Cancelled</span>
                     <% end %>
                   </p>
                   <p class="text-xs text-slate-500 dark:text-slate-400">
                     <%= importer[:description] %>
                   </p>
-                  <% if run&.completed? || run&.failed? %>
+                  <% if run&.completed? || run&.failed? || run&.cancelled? %>
                     <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
-                      <% if run.completed? && run.records_count&.positive? %>
+                      <% if run.records_count&.positive? %>
                         <%= number_with_delimiter(run.records_count) %> records &middot;
                       <% end %>
                       <%= time_ago_in_words(run.completed_at) %> ago
@@ -64,14 +58,26 @@
                       <% end %>
                     </p>
                   <% end %>
+                  <% if run&.running? && run.total_count&.positive? %>
+                    <div class="mt-1.5 flex items-center gap-2">
+                      <div class="w-32 h-1.5 bg-slate-200 dark:bg-slate-600 rounded-full overflow-hidden">
+                        <div class="h-full bg-blue-500 rounded-full transition-all" style="width: <%= run.progress_percentage %>%"></div>
+                      </div>
+                      <span class="text-[11px] text-slate-400 dark:text-slate-500"><%= run.progress_percentage %>%</span>
+                    </div>
+                  <% end %>
                   <% if run&.failed? && run.error_message.present? %>
                     <p class="text-[11px] text-red-500 dark:text-red-400 mt-0.5 line-clamp-1"><%= run.error_message %></p>
                   <% end %>
                 </div>
               </div>
-              <%= button_to run&.completed? ? "Re-import" : "Run", admin_imports_run_path(key: importer[:key]), method: :post,
-                    disabled: !importer[:files_present] || run&.running?,
-                    class: "px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer shrink-0 #{importer[:files_present] && !run&.running? ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200' : 'bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed'}" %>
+              <% if run&.running? %>
+                <%= button_to "Cancel", admin_imports_cancel_path(run), method: :post,
+                      class: "px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer shrink-0 bg-red-600 text-white hover:bg-red-700" %>
+              <% else %>
+                <%= button_to run&.completed? ? "Re-import" : "Run", admin_imports_run_path(key: importer[:key]), method: :post,
+                      class: "px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer shrink-0 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200" %>
+              <% end %>
             </div>
           <% end %>
         </div>

@@ -2,15 +2,17 @@
 #
 # Table name: import_runs
 #
-#  id            :bigint           not null, primary key
-#  completed_at  :datetime
-#  error_message :text
-#  key           :string           not null
-#  records_count :integer          default(0)
-#  started_at    :datetime
-#  status        :string           default("pending"), not null
-#  created_at    :datetime         not null
-#  updated_at    :datetime         not null
+#  id              :bigint           not null, primary key
+#  completed_at    :datetime
+#  error_message   :text
+#  key             :string           not null
+#  processed_count :integer          default(0)
+#  records_count   :integer          default(0)
+#  started_at      :datetime
+#  status          :string           default("pending"), not null
+#  total_count     :integer          default(0)
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
 #
 # Indexes
 #
@@ -18,7 +20,7 @@
 #  index_import_runs_on_status  (status)
 #
 class ImportRun < ApplicationRecord
-  STATUSES = %w[pending running completed failed].freeze
+  STATUSES = %w[pending running completed failed cancelled].freeze
 
   validates :key, presence: true
   validates :status, inclusion: { in: STATUSES }
@@ -35,6 +37,19 @@ class ImportRun < ApplicationRecord
 
   def failed?
     status == "failed"
+  end
+
+  def cancelled?
+    status == "cancelled"
+  end
+
+  def cancel!
+    update!(status: "cancelled", completed_at: Time.current)
+  end
+
+  def progress_percentage
+    return 0 if total_count.nil? || total_count.zero?
+    [ (processed_count.to_f / total_count * 100).round, 100 ].min
   end
 
   def duration

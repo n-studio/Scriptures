@@ -5,11 +5,12 @@ module Import
     # Surah metadata: index => { name:, tname:, ename:, type:, ayas: }
     # Loaded from quran-data.xml if available, otherwise uses English names.
 
-    def initialize(file:, abbreviation:, name:, language:)
+    def initialize(file:, abbreviation:, name:, language:, progress: nil)
       @file = file
       @abbreviation = abbreviation
       @name = name
       @language = language
+      @progress = progress
     end
 
     def run
@@ -25,7 +26,9 @@ module Import
       current_surah = nil
       current_division = nil
 
-      lines.each do |line|
+      @progress&.call(0, lines.size)
+
+      lines.each_with_index do |line, idx|
         surah_num, ayah_num, text = line.split("|", 3)
         surah_num = surah_num.to_i
         ayah_num = ayah_num.to_i
@@ -58,7 +61,9 @@ module Import
         end
 
         total += 1
+        @progress&.call(idx + 1, lines.size) if (idx + 1) % 500 == 0
       end
+      @progress&.call(lines.size, lines.size)
 
       puts "  #{@abbreviation}: #{total} passage translations imported"
     end

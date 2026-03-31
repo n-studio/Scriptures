@@ -31,8 +31,9 @@ module Import
       "87" => [ "Revelation", 27 ]
     }.freeze
 
-    def initialize(directory:)
+    def initialize(directory:, progress: nil)
       @directory = directory
+      @progress = progress
     end
 
     def run
@@ -47,7 +48,9 @@ module Import
 
       total_passages = 0
 
-      files.each do |file|
+      @progress&.call(0, files.size)
+
+      files.each_with_index do |file, file_idx|
         book_code = File.basename(file).split("-").first
         book_name, position = BOOKS[book_code]
         next unless book_name
@@ -92,7 +95,7 @@ module Import
           total_passages += 1
         end
 
-        print "."
+        @progress&.call(file_idx + 1, files.size)
       end
 
       puts "\n  SBLGNT: #{total_passages} passage translations imported"

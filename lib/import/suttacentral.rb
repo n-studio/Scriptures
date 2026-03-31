@@ -2,13 +2,14 @@ require "json"
 
 module Import
   class Suttacentral
-    def initialize(pali_dir:, translation_dir: nil, translation_abbreviation: nil, translation_name: nil, scripture_name:, scripture_slug:)
+    def initialize(pali_dir:, translation_dir: nil, translation_abbreviation: nil, translation_name: nil, scripture_name:, scripture_slug:, progress: nil)
       @pali_dir = pali_dir
       @translation_dir = translation_dir
       @translation_abbreviation = translation_abbreviation
       @translation_name = translation_name
       @scripture_name = scripture_name
       @scripture_slug = scripture_slug
+      @progress = progress
     end
 
     def run
@@ -49,7 +50,9 @@ module Import
         d.position = 1
       end
 
-      pali_verses.each do |verse_num, pali_text|
+      @progress&.call(0, pali_verses.size)
+
+      pali_verses.each_with_index do |(verse_num, pali_text), idx|
         passage = Passage.find_or_create_by!(division: division, number: verse_num) do |p|
           p.position = verse_num
         end
@@ -65,7 +68,9 @@ module Import
         end
 
         total += 1
+        @progress&.call(idx + 1, pali_verses.size) if (idx + 1) % 100 == 0
       end
+      @progress&.call(pali_verses.size, pali_verses.size)
 
       puts "  #{@scripture_name}: #{total} passages imported"
     end

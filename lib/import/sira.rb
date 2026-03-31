@@ -22,11 +22,13 @@ module Import
       { number: 7, title: "The End of the Blessed Journey in the Worldly Life" }
     ].freeze
 
-    # Normalized part titles for fuzzy matching against OCR text
-    PART_PATTERNS = PARTS.map { |p| [ normalize(p[:title]), p[:number] ] }.freeze
+    def self.part_patterns
+      @part_patterns ||= PARTS.map { |p| [ normalize(p[:title]), p[:number] ] }.freeze
+    end
 
-    def initialize(file:)
+    def initialize(file:, progress: nil)
       @file = Pathname.new(file)
+      @progress = progress
     end
 
     def run
@@ -47,6 +49,10 @@ module Import
 
       parts_data = parse_text(raw)
       total = 0
+
+      total_sections = parts_data.sum { |p| p[:sections].size }
+      sections_done = 0
+      @progress&.call(0, total_sections)
 
       parts_data.each do |part|
         part_info = PARTS.find { |p| p[:number] == part[:number] } || { title: "Part #{part[:number]}" }
@@ -79,6 +85,9 @@ module Import
 
             total += 1
           end
+
+          sections_done += 1
+          @progress&.call(sections_done, total_sections)
         end
       end
 
@@ -129,7 +138,7 @@ module Import
       normalized = self.class.normalize(line)
       return nil if normalized.length < 10 || normalized.length > 120
 
-      PART_PATTERNS.each do |pattern, number|
+      self.class.part_patterns.each do |pattern, number|
         # Fuzzy match: check if most words from the pattern appear in the line
         pattern_words = pattern.split
         line_words = normalized.split

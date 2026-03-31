@@ -103,6 +103,7 @@ Rails.application.routes.draw do
     post "imports/download", to: "imports#download", as: :imports_download
     post "imports/run", to: "imports#run", as: :imports_run
     post "imports/run_all", to: "imports#run_all", as: :imports_run_all
+    post "imports/cancel/:id", to: "imports#cancel", as: :imports_cancel
     resources :import_runs, only: [ :index, :show, :destroy ]
   end
 

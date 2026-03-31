@@ -1,15 +1,26 @@
 class RunImportJob < ApplicationJob
   queue_as :default
 
+  class CancelledError < StandardError; end
+
   def perform(key, import_run: nil)
     import_run ||= ImportRun.create!(key: key)
     import_run.update!(status: "running", started_at: Time.current)
+
+    @import_run = import_run
+
+    # Download source files for this importer before running
+    DownloadSourcesJob.new.perform(key)
 
     count_before = total_record_count
     run_importer(key)
     records_created = total_record_count - count_before
 
     import_run.update!(status: "completed", completed_at: Time.current, records_count: records_created)
+  rescue CancelledError
+    # Already marked as cancelled by cancel! — just record the count
+    records_created = total_record_count - (count_before || total_record_count)
+    import_run&.update_columns(records_count: records_created)
   rescue => e
     import_run&.update!(status: "failed", completed_at: Time.current, error_message: e.message)
     raise
@@ -18,33 +29,34 @@ class RunImportJob < ApplicationJob
   private
 
   def run_importer(key)
+    cb = progress_callback
     case key
     when "all"           then run_all
     # Bible translations from scrollmapper JSON format
-    when "bible_kjv"     then Import::BibleJson.new(file: source("kjv.json"), abbreviation: "KJV", name: "King James Version", language: "English").run
-    when "bible_asv"     then Import::BibleJson.new(file: source("asv.json"), abbreviation: "ASV", name: "American Standard Version", language: "English").run
-    when "bible_ylt"     then Import::BibleJson.new(file: source("ylt.json"), abbreviation: "YLT", name: "Young's Literal Translation", language: "English").run
-    when "bible_darby"   then Import::BibleJson.new(file: source("darby.json"), abbreviation: "DBY", name: "Darby Translation", language: "English").run
+    when "bible_kjv"     then Import::BibleJson.new(file: source("kjv.json"), abbreviation: "KJV", name: "King James Version", language: "English", progress: cb).run
+    when "bible_asv"     then Import::BibleJson.new(file: source("asv.json"), abbreviation: "ASV", name: "American Standard Version", language: "English", progress: cb).run
+    when "bible_ylt"     then Import::BibleJson.new(file: source("ylt.json"), abbreviation: "YLT", name: "Young's Literal Translation", language: "English", progress: cb).run
+    when "bible_darby"   then Import::BibleJson.new(file: source("darby.json"), abbreviation: "DBY", name: "Darby Translation", language: "English", progress: cb).run
     # Quran from Tanzil pipe-delimited text format
-    when "quran_arabic"  then Import::QuranTanzil.new(file: source("quran_arabic.txt"), abbreviation: "QAR", name: "Quran (Simple Arabic)", language: "Arabic").run
-    when "quran_sahih"   then Import::QuranTanzil.new(file: source("quran_sahih.txt"), abbreviation: "SAH", name: "Sahih International", language: "English").run
-    when "quran_yusufali" then Import::QuranTanzil.new(file: source("quran_yusufali.txt"), abbreviation: "YAL", name: "Yusuf Ali", language: "English").run
-    when "quran_pickthall" then Import::QuranTanzil.new(file: source("quran_pickthall.txt"), abbreviation: "PKT", name: "Pickthall", language: "English").run
+    when "quran_arabic"  then Import::QuranTanzil.new(file: source("quran_arabic.txt"), abbreviation: "QAR", name: "Quran (Simple Arabic)", language: "Arabic", progress: cb).run
+    when "quran_sahih"   then Import::QuranTanzil.new(file: source("quran_sahih.txt"), abbreviation: "SAH", name: "Sahih International", language: "English", progress: cb).run
+    when "quran_yusufali" then Import::QuranTanzil.new(file: source("quran_yusufali.txt"), abbreviation: "YAL", name: "Yusuf Ali", language: "English", progress: cb).run
+    when "quran_pickthall" then Import::QuranTanzil.new(file: source("quran_pickthall.txt"), abbreviation: "PKT", name: "Pickthall", language: "English", progress: cb).run
     # Tafsir (Quranic exegesis) from spa5k/tafsir_api JSON files
-    when "tafsir"        then run_tafsir
+    when "tafsir"        then run_tafsir(cb)
     # SBLGNT Greek New Testament from MorphGNT word-level files
-    when "sblgnt"        then Import::Sblgnt.new(directory: source("sblgnt")).run
+    when "sblgnt"        then Import::Sblgnt.new(directory: source("sblgnt"), progress: cb).run
     # SuttaCentral bilara-data (Pali + English)
-    when "suttacentral"  then run_suttacentral
+    when "suttacentral"  then run_suttacentral(cb)
     # Hadith collections from AhmedBaset/hadith-json by_book JSON format
-    when "hadith"        then run_hadith
+    when "hadith"        then run_hadith(cb)
     # Dead Sea Scrolls from BiblicalDSS JSON
-    when "dead_sea_scrolls" then Import::DeadSeaScrolls.new(file: source("biblical_dss.json")).run
+    when "dead_sea_scrolls" then Import::DeadSeaScrolls.new(file: source("biblical_dss.json"), progress: cb).run
     # Sira (prophetic biography) from Internet Archive DjVu text
-    when "sira" then Import::Sira.new(file: source("sira/sirat_ibn_hisham.txt")).run
+    when "sira" then Import::Sira.new(file: source("sira/sirat_ibn_hisham.txt"), progress: cb).run
     # Strong's lexicon from OpenScriptures JS format
-    when "strongs_hebrew" then Import::StrongsLexicon.new(file: source("strongs_hebrew.js"), language: "Hebrew").run
-    when "strongs_greek" then Import::StrongsLexicon.new(file: source("strongs_greek.js"), language: "Greek").run
+    when "strongs_hebrew" then Import::StrongsLexicon.new(file: source("strongs_hebrew.js"), language: "Hebrew", progress: cb).run
+    when "strongs_greek" then Import::StrongsLexicon.new(file: source("strongs_greek.js"), language: "Greek", progress: cb).run
     # Classify translations by edition type (critical, devotional, original)
     when "classify_translations" then classify_translations
     else raise ArgumentError, "Unknown importer: #{key}"
@@ -55,28 +67,39 @@ class RunImportJob < ApplicationJob
     Rails.root.join("db/seeds/sources", path)
   end
 
-  def run_tafsir
-    Import::Tafsir::EDITIONS.each_key do |edition|
-      edition_dir = source("tafsir/#{edition}")
-      Import::Tafsir.new(directory: edition_dir, edition: edition).run if edition_dir.exist?
+  def progress_callback
+    lambda do |processed, total|
+      @import_run&.update_columns(processed_count: processed, total_count: total)
+      raise CancelledError, "Import cancelled" if @import_run&.reload&.cancelled?
     end
   end
 
-  def run_suttacentral
+  def run_tafsir(cb)
+    Import::Tafsir::EDITIONS.each_key do |edition|
+      edition_dir = source("tafsir/#{edition}")
+      Import::Tafsir.new(directory: edition_dir, edition: edition, progress: cb).run if edition_dir.exist?
+    end
+  end
+
+  def run_suttacentral(cb)
     Import::Suttacentral.new(
       pali_dir: source("suttacentral/dhp/pali"),
       translation_dir: source("suttacentral/dhp/en"),
       translation_abbreviation: "SUJ",
       translation_name: "Bhikkhu Sujato",
       scripture_name: "Dhammapada",
-      scripture_slug: "dhammapada"
+      scripture_slug: "dhammapada",
+      progress: cb
     ).run
   end
 
-  def run_hadith
-    source("hadith").glob("*.json").sort.each do |file|
+  def run_hadith(cb)
+    files = source("hadith").glob("*.json").sort
+    files.each_with_index do |file, idx|
+      cb.call(idx, files.size)
       Import::Hadith.new(file: file).run
     end
+    cb.call(files.size, files.size)
   end
 
   # Import all available source data

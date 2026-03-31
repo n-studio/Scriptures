@@ -2,8 +2,9 @@ require "json"
 
 module Import
   class DeadSeaScrolls
-    def initialize(file:)
+    def initialize(file:, progress: nil)
       @file = file
+      @progress = progress
     end
 
     def run
@@ -16,7 +17,9 @@ module Import
       total_passages = 0
       total_manuscripts = 0
 
-      data.each do |scroll_data|
+      @progress&.call(0, data.size)
+
+      data.each_with_index do |scroll_data, scroll_idx|
         scroll_name = scroll_data["scroll"]
         verses = scroll_data["verses"]
         next if verses.empty?
@@ -64,7 +67,7 @@ module Import
           total_passages += 1
         end
 
-        print "."
+        @progress&.call(scroll_idx + 1, data.size)
       end
 
       puts "\n  Dead Sea Scrolls: #{total_manuscripts} manuscripts, #{total_passages} passage variants imported"

@@ -32,10 +32,11 @@ module Import
       }
     }.freeze
 
-    def initialize(directory:, edition:)
+    def initialize(directory:, edition:, progress: nil)
       @directory = Pathname.new(directory)
       @edition = edition
       @edition_info = EDITIONS[edition] || raise("Unknown edition: #{edition}. Available: #{EDITIONS.keys.join(', ')}")
+      @progress = progress
     end
 
     def run
@@ -53,6 +54,8 @@ module Import
 
       total = 0
       skipped = 0
+
+      @progress&.call(0, 114)
 
       (1..114).each do |surah_num|
         file = @directory.join("#{surah_num}.json")
@@ -83,6 +86,8 @@ module Import
 
           total += 1
         end
+
+        @progress&.call(surah_num, 114)
       end
 
       puts "  #{@edition_info[:name]}: #{total} commentaries imported (#{skipped} skipped — no matching passage)"
