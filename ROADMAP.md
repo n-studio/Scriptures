@@ -52,10 +52,44 @@ Prioritise critical editions and scholarly sources over devotional translations:
 **Pali Canon**
 - [x] SuttaCentral data (JSON) — Dhammapada imported (423 verses, Pali + Bhikkhu Sujato English)
 
+**Hindu**
+- [ ] Vedas — GRETIL (Göttingen Register of Electronic Texts in Indian Languages) has critical e-texts; Sanskrit originals are public domain
+- [ ] Upanishads — GRETIL or Sacred Texts Archive (sacred-texts.com); Max Müller translations (1879–1884) are public domain
+- [ ] Bhagavad Gita — GRETIL Sanskrit text; public domain translations (Edwin Arnold 1885, Swami Vivekananda)
+- [ ] Mahabharata / Ramayana — GRETIL critical editions; Bhandarkar Oriental Research Institute critical edition of the Mahabharata
+
+**Zoroastrian**
+- [ ] Avesta — avesta.org has Gathic hymns and Yasna texts; original Avestan is public domain
+- [ ] Sacred Books of the East translations (Max Müller, 1880s) — public domain, available via sacred-texts.com and Internet Archive
+
+**Mesopotamian**
+- [x] Epic of Gilgamesh — R. Campbell Thompson literal English hexameter translation (1928), Internet Archive DjVu text (public domain)
+- [x] Enuma Elish — E.A. Wallis Budge, "The Babylonian Legends of Creation" (1921), Internet Archive DjVu text (public domain)
+- [ ] ORACC (Open Richly Annotated Cuneiform Corpus) for Akkadian/Babylonian texts
+
+**Egyptian**
+- [ ] Book of the Dead — public domain translations (E.A. Wallis Budge 1895); TLA (Thesaurus Linguae Aegyptiae) for hieroglyphic texts
+- [ ] Pyramid Texts — Samuel Mercer translation (1952) may be public domain; BBAW digital edition
+- [ ] Coffin Texts — Adriaan de Buck critical edition; public domain translations limited
+
+**Greco-Roman**
+- [ ] Homeric Hymns — Perseus Digital Library (Tufts) has Greek texts and English translations; public domain
+- [ ] Orphic texts — Perseus and Thesaurus Linguae Graecae (TLG) for Greek originals
+- [ ] Hesiod (Theogony, Works and Days) — Perseus Digital Library; Hugh G. Evelyn-White translation (1914) is public domain
+
+**Norse**
+- [ ] Poetic Edda — Völuspá, Hávamál, etc.; Henry Adams Bellows translation (1923) is public domain; Old Norse texts available via heimskringla.no
+- [ ] Prose Edda (Snorri Sturluson) — Arthur Gilchrist Brodeur translation (1916) is public domain; Old Norse via heimskringla.no
+
+**Celtic**
+- [ ] Mabinogion — Lady Charlotte Guest translation (1849) is public domain; Welsh text from Rhyddiaith Gymraeg corpus
+- [ ] Lebor Gabála Érenn — R.A.S. Macalister translation (1938–1956); Old Irish texts via CELT (Corpus of Electronic Texts, University College Cork)
+- [ ] Ulster Cycle / Fenian Cycle — CELT has Old and Middle Irish texts with translations
+
 **Other traditions**
 - [ ] Identify reliable public domain sources for each corpus listed in the README
 - [ ] Prefer critical editions with manuscript notes over popular devotional editions
-- [x] Write an importer rake task per source format — bible_json, quran_tanzil, sblgnt, strongs, suttacentral, hadith, tafsir, sira
+- [x] Write an importer rake task per source format — bible_json, quran_tanzil, sblgnt, strongs, suttacentral, hadith, tafsir, sira, mesopotamian
 
 ### 1.3 Import pipeline
 

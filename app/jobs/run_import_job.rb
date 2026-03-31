@@ -57,6 +57,27 @@ class RunImportJob < ApplicationJob
     # Strong's lexicon from OpenScriptures JS format
     when "strongs_hebrew" then Import::StrongsLexicon.new(file: source("strongs_hebrew.js"), language: "Hebrew", progress: cb).run
     when "strongs_greek" then Import::StrongsLexicon.new(file: source("strongs_greek.js"), language: "Greek", progress: cb).run
+    # Mesopotamian texts from Internet Archive DjVu text
+    when "gilgamesh" then Import::Mesopotamian.new(
+      file: source("mesopotamian/gilgamesh_thompson.txt"),
+      scripture_name: "Epic of Gilgamesh",
+      scripture_slug: "epic-of-gilgamesh",
+      scripture_description: "The oldest surviving great work of literature, composed in Akkadian. " \
+                             "Twelve tablets recounting the deeds of Gilgamesh, king of Uruk. " \
+                             "Standard Babylonian version from the library of Ashurbanipal (7th c. BCE).",
+      translation_abbreviation: "THO", translation_name: "R. Campbell Thompson (1928)",
+      progress: cb
+    ).run
+    when "enuma_elish" then Import::Mesopotamian.new(
+      file: source("mesopotamian/enuma_elish_budge.txt"),
+      scripture_name: "Enuma Elish",
+      scripture_slug: "enuma-elish",
+      scripture_description: "The Babylonian creation epic, composed in Akkadian on seven tablets. " \
+                             "Recounts Marduk's victory over Tiamat and the creation of the world. " \
+                             "Recited during the New Year festival (Akitu) in Babylon.",
+      translation_abbreviation: "BDG", translation_name: "E.A. Wallis Budge (1921)",
+      progress: cb
+    ).run
     # Classify translations by edition type (critical, devotional, original)
     when "classify_translations" then classify_translations
     else raise ArgumentError, "Unknown importer: #{key}"
@@ -108,6 +129,7 @@ class RunImportJob < ApplicationJob
       bible_kjv bible_asv bible_ylt bible_darby
       quran_arabic quran_sahih quran_yusufali quran_pickthall tafsir
       sblgnt suttacentral hadith sira dead_sea_scrolls
+      gilgamesh enuma_elish
       strongs_hebrew strongs_greek classify_translations
     ].each do |sub_key|
       sub_run = ImportRun.create!(key: sub_key)

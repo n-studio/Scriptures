@@ -85,6 +85,18 @@ namespace :import do
     Import::Sira.new(file: Rails.root.join(file)).run
   end
 
+  desc "Import Epic of Gilgamesh from Thompson 1928 DjVu text"
+  task :gilgamesh, [ :file ] => :environment do |_t, args|
+    file = args[:file] || "db/seeds/sources/mesopotamian/gilgamesh_thompson.txt"
+    RunImportJob.perform_now("gilgamesh")
+  end
+
+  desc "Import Enuma Elish from Budge 1921 DjVu text"
+  task :enuma_elish, [ :file ] => :environment do |_t, args|
+    file = args[:file] || "db/seeds/sources/mesopotamian/enuma_elish_budge.txt"
+    RunImportJob.perform_now("enuma_elish")
+  end
+
   desc "Import all available source data"
   task all: :environment do
     Rake::Task["import:download"].invoke

@@ -85,7 +85,13 @@ class DownloadSourcesJob < ApplicationJob
 
     # openscriptures/strongs — CC BY-SA 3.0; original Strong's dictionary (1890/1894) is public domain
     "strongs_hebrew" => { "strongs_hebrew.js" => "https://raw.githubusercontent.com/openscriptures/strongs/master/hebrew/strongs-hebrew-dictionary.js" },
-    "strongs_greek" => { "strongs_greek.js" => "https://raw.githubusercontent.com/openscriptures/strongs/master/greek/strongs-greek-dictionary.js" }
+    "strongs_greek" => { "strongs_greek.js" => "https://raw.githubusercontent.com/openscriptures/strongs/master/greek/strongs-greek-dictionary.js" },
+
+    # Mesopotamian texts — public domain translations from Internet Archive
+    # R. Campbell Thompson, "The Epic of Gilgamish" (1928) — literal English hexameter translation
+    "gilgamesh" => { "mesopotamian/gilgamesh_thompson.txt" => "https://archive.org/download/thompson-1928-gilgamesh/Thompson_1928_Gilgamesh_djvu.txt" },
+    # E.A. Wallis Budge, "The Babylonian Legends of Creation" (1921) — British Museum guide with Enuma Elish translation
+    "enuma_elish" => { "mesopotamian/enuma_elish_budge.txt" => "https://archive.org/download/pdfy-MfMlja9m9e6QYsfR/The%20Babylonian%20Legends%20Of%20Creation_djvu.txt" }
   }.freeze
   # rubocop:enable Layout/LineLength
 
