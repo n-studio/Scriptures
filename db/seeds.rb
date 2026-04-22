@@ -135,24 +135,6 @@ Scripture.find_or_create_by!(slug: "john", corpus: nt) do |s|
   s.description = "The Gospel according to John, likely composed ~90-100 CE."
 end
 
-# Divisions (chapters) for Genesis
-gen_ch1 = Division.find_or_create_by!(scripture: genesis, number: 1) do |d|
-  d.name = "Chapter 1"
-  d.position = 1
-end
-
-Division.find_or_create_by!(scripture: genesis, number: 2) do |d|
-  d.name = "Chapter 2"
-  d.position = 2
-end
-
-# Passages for Genesis 1:1-5
-gen_passages = (1..5).map do |n|
-  Passage.find_or_create_by!(division: gen_ch1, number: n) do |p|
-    p.position = n
-  end
-end
-
 # Translations
 wlc = Translation.find_or_create_by!(abbreviation: "WLC", corpus: bible) do |t|
   t.name = "Westminster Leningrad Codex"
@@ -173,87 +155,6 @@ lxx = Translation.find_or_create_by!(abbreviation: "LXX", corpus: bible) do |t|
   t.language = "Greek"
   t.edition_type = "critical"
   t.description = "The ancient Greek translation of the Hebrew scriptures, produced in Alexandria c. 3rd-2nd century BCE."
-end
-
-# Genesis 1:1-5 in Hebrew (WLC / Masoretic Text)
-hebrew_texts = [
-  "בְּרֵאשִׁית בָּרָא אֱלֹהִים אֵת הַשָּׁמַיִם וְאֵת הָאָרֶץ׃",
-  "וְהָאָרֶץ הָיְתָה תֹהוּ וָבֹהוּ וְחֹשֶׁךְ עַל־פְּנֵי תְהוֹם וְרוּחַ אֱלֹהִים מְרַחֶפֶת עַל־פְּנֵי הַמָּיִם׃",
-  "וַיֹּאמֶר אֱלֹהִים יְהִי אוֹר וַיְהִי־אוֹר׃",
-  "וַיַּרְא אֱלֹהִים אֶת־הָאוֹר כִּי־טוֹב וַיַּבְדֵּל אֱלֹהִים בֵּין הָאוֹר וּבֵין הַחֹשֶׁךְ׃",
-  "וַיִּקְרָא אֱלֹהִים ׀ לָאוֹר יוֹם וְלַחֹשֶׁךְ קָרָא לָיְלָה וַיְהִי־עֶרֶב וַיְהִי־בֹקֶר יוֹם אֶחָד׃"
-]
-
-# Genesis 1:1-5 in English (KJV)
-kjv_texts = [
-  "In the beginning God created the heaven and the earth.",
-  "And the earth was without form, and void; and darkness was upon the face of the deep. And the Spirit of God moved upon the face of the waters.",
-  "And God said, Let there be light: and there was light.",
-  "And God saw the light, that it was good: and God divided the light from the darkness.",
-  "And God called the light Day, and the darkness he called Night. And the evening and the morning were the first day."
-]
-
-# Genesis 1:1-5 in Greek (Septuagint)
-lxx_texts = [
-  "ἐν ἀρχῇ ἐποίησεν ὁ θεὸς τὸν οὐρανὸν καὶ τὴν γῆν.",
-  "ἡ δὲ γῆ ἦν ἀόρατος καὶ ἀκατασκεύαστος, καὶ σκότος ἐπάνω τῆς ἀβύσσου, καὶ πνεῦμα θεοῦ ἐπεφέρετο ἐπάνω τοῦ ὕδατος.",
-  "καὶ εἶπεν ὁ θεός Γενηθήτω φῶς. καὶ ἐγένετο φῶς.",
-  "καὶ εἶδεν ὁ θεὸς τὸ φῶς ὅτι καλόν. καὶ διεχώρισεν ὁ θεὸς ἀνὰ μέσον τοῦ φωτὸς καὶ ἀνὰ μέσον τοῦ σκότους.",
-  "καὶ ἐκάλεσεν ὁ θεὸς τὸ φῶς ἡμέραν καὶ τὸ σκότος ἐκάλεσεν νύκτα. καὶ ἐγένετο ἑσπέρα καὶ ἐγένετο πρωί, ἡμέρα μία."
-]
-
-gen_passages.each_with_index do |passage, i|
-  PassageTranslation.find_or_create_by!(passage: passage, translation: wlc) { |pt| pt.text = hebrew_texts[i] }
-  PassageTranslation.find_or_create_by!(passage: passage, translation: kjv) { |pt| pt.text = kjv_texts[i] }
-  PassageTranslation.find_or_create_by!(passage: passage, translation: lxx) { |pt| pt.text = lxx_texts[i] }
-
-  # All Genesis 1:1-5 attributed to Priestly source
-  PassageSourceDocument.find_or_create_by!(passage: passage, source_document: p_source)
-end
-
-# Lexicon entries for Genesis 1:1 (Hebrew)
-bereshit = LexiconEntry.find_or_create_by!(strongs_number: "H7225") do |e|
-  e.lemma = "רֵאשִׁית"
-  e.language = "Hebrew"
-  e.transliteration = "reshith"
-  e.definition = "Beginning, first, chief. From rosh (head). Used to denote the start of a period or the first in rank."
-  e.morphology_label = "noun, feminine, singular, construct"
-end
-
-bara = LexiconEntry.find_or_create_by!(strongs_number: "H1254") do |e|
-  e.lemma = "בָּרָא"
-  e.language = "Hebrew"
-  e.transliteration = "bara"
-  e.definition = "To create, to shape, to form. Used exclusively with God as subject in the Qal stem, indicating divine creative activity."
-  e.morphology_label = "verb, Qal, perfect, 3rd person, masculine, singular"
-end
-
-elohim = LexiconEntry.find_or_create_by!(strongs_number: "H430") do |e|
-  e.lemma = "אֱלֹהִים"
-  e.language = "Hebrew"
-  e.transliteration = "elohim"
-  e.definition = "God, gods, divine beings. Plural form of eloah. When used with singular verbs, refers to the God of Israel."
-  e.morphology_label = "noun, masculine, plural"
-end
-
-# Original language tokens for Genesis 1:1
-gen_1_1 = gen_passages[0]
-[
-  { position: 1, text: "בְּרֵאשִׁית", transliteration: "bereshith", lemma: "רֵאשִׁית", morphology: "prep+n-fs-c", lexicon_entry: bereshit },
-  { position: 2, text: "בָּרָא", transliteration: "bara", lemma: "בָּרָא", morphology: "v-Qp3ms", lexicon_entry: bara },
-  { position: 3, text: "אֱלֹהִים", transliteration: "elohim", lemma: "אֱלֹהִים", morphology: "n-mp", lexicon_entry: elohim },
-  { position: 4, text: "אֵת", transliteration: "eth", lemma: "אֵת", morphology: "part-do" },
-  { position: 5, text: "הַשָּׁמַיִם", transliteration: "hashamayim", lemma: "שָׁמַיִם", morphology: "art+n-mp" },
-  { position: 6, text: "וְאֵת", transliteration: "ve'eth", lemma: "וְ+אֵת", morphology: "conj+part-do" },
-  { position: 7, text: "הָאָרֶץ", transliteration: "ha'arets", lemma: "אֶרֶץ", morphology: "art+n-fs" }
-].each do |attrs|
-  OriginalLanguageToken.find_or_create_by!(passage: gen_1_1, position: attrs[:position]) do |t|
-    t.text = attrs[:text]
-    t.transliteration = attrs[:transliteration]
-    t.lemma = attrs[:lemma]
-    t.morphology = attrs[:morphology]
-    t.lexicon_entry = attrs[:lexicon_entry]
-  end
 end
 
 # Manuscripts
@@ -280,17 +181,6 @@ Manuscript.find_or_create_by!(abbreviation: "WLC", corpus: bible) do |m|
   m.description = "The oldest complete manuscript of the Hebrew Bible in the Masoretic Text tradition. Based on Codex Leningradensis."
 end
 
-# Textual variant example: Genesis 1:1 in Codex Sinaiticus vs Vaticanus (LXX)
-TextualVariant.find_or_create_by!(passage: gen_1_1, manuscript: sinaiticus) do |v|
-  v.text = "ἐν ἀρχῇ ἐποίησεν ὁ θεὸς τὸν οὐρανὸν καὶ τὴν γῆν"
-  v.notes = "Sinaiticus reading of Genesis 1:1 matches the standard LXX text."
-end
-
-TextualVariant.find_or_create_by!(passage: gen_1_1, manuscript: vaticanus) do |v|
-  v.text = "ἐν ἀρχῇ ἐποίησεν ὁ θεὸς τὸν οὐρανὸν καὶ τὴν γῆν"
-  v.notes = "Vaticanus reading of Genesis 1:1 matches the standard LXX text. No significant variants."
-end
-
 # Composition dates
 CompositionDate.find_or_create_by!(scripture: genesis) do |d|
   d.earliest_year = -950
@@ -310,11 +200,126 @@ Scripture.find_by(slug: "mark", corpus: nt)&.tap do |mark|
   end
 end
 
-# Admin user
-User.find_or_create_by!(email: "admin@myscriptures.app") do |u|
-  u.display_name = "Admin"
-  u.password = "password"
-  u.admin = true
+# Placeholder content (Genesis 1:1-5 demo passages + default admin) — never seed in production.
+# Real production passages, lexicon, and variants are loaded via import; production must not
+# ship a user with a known default password.
+unless Rails.env.production?
+  # Divisions (chapters) for Genesis
+  gen_ch1 = Division.find_or_create_by!(scripture: genesis, number: 1) do |d|
+    d.name = "Chapter 1"
+    d.position = 1
+  end
+
+  Division.find_or_create_by!(scripture: genesis, number: 2) do |d|
+    d.name = "Chapter 2"
+    d.position = 2
+  end
+
+  # Passages for Genesis 1:1-5
+  gen_passages = (1..5).map do |n|
+    Passage.find_or_create_by!(division: gen_ch1, number: n) do |p|
+      p.position = n
+    end
+  end
+
+  # Genesis 1:1-5 in Hebrew (WLC / Masoretic Text)
+  hebrew_texts = [
+    "בְּרֵאשִׁית בָּרָא אֱלֹהִים אֵת הַשָּׁמַיִם וְאֵת הָאָרֶץ׃",
+    "וְהָאָרֶץ הָיְתָה תֹהוּ וָבֹהוּ וְחֹשֶׁךְ עַל־פְּנֵי תְהוֹם וְרוּחַ אֱלֹהִים מְרַחֶפֶת עַל־פְּנֵי הַמָּיִם׃",
+    "וַיֹּאמֶר אֱלֹהִים יְהִי אוֹר וַיְהִי־אוֹר׃",
+    "וַיַּרְא אֱלֹהִים אֶת־הָאוֹר כִּי־טוֹב וַיַּבְדֵּל אֱלֹהִים בֵּין הָאוֹר וּבֵין הַחֹשֶׁךְ׃",
+    "וַיִּקְרָא אֱלֹהִים ׀ לָאוֹר יוֹם וְלַחֹשֶׁךְ קָרָא לָיְלָה וַיְהִי־עֶרֶב וַיְהִי־בֹקֶר יוֹם אֶחָד׃"
+  ]
+
+  # Genesis 1:1-5 in English (KJV)
+  kjv_texts = [
+    "In the beginning God created the heaven and the earth.",
+    "And the earth was without form, and void; and darkness was upon the face of the deep. And the Spirit of God moved upon the face of the waters.",
+    "And God said, Let there be light: and there was light.",
+    "And God saw the light, that it was good: and God divided the light from the darkness.",
+    "And God called the light Day, and the darkness he called Night. And the evening and the morning were the first day."
+  ]
+
+  # Genesis 1:1-5 in Greek (Septuagint)
+  lxx_texts = [
+    "ἐν ἀρχῇ ἐποίησεν ὁ θεὸς τὸν οὐρανὸν καὶ τὴν γῆν.",
+    "ἡ δὲ γῆ ἦν ἀόρατος καὶ ἀκατασκεύαστος, καὶ σκότος ἐπάνω τῆς ἀβύσσου, καὶ πνεῦμα θεοῦ ἐπεφέρετο ἐπάνω τοῦ ὕδατος.",
+    "καὶ εἶπεν ὁ θεός Γενηθήτω φῶς. καὶ ἐγένετο φῶς.",
+    "καὶ εἶδεν ὁ θεὸς τὸ φῶς ὅτι καλόν. καὶ διεχώρισεν ὁ θεὸς ἀνὰ μέσον τοῦ φωτὸς καὶ ἀνὰ μέσον τοῦ σκότους.",
+    "καὶ ἐκάλεσεν ὁ θεὸς τὸ φῶς ἡμέραν καὶ τὸ σκότος ἐκάλεσεν νύκτα. καὶ ἐγένετο ἑσπέρα καὶ ἐγένετο πρωί, ἡμέρα μία."
+  ]
+
+  gen_passages.each_with_index do |passage, i|
+    PassageTranslation.find_or_create_by!(passage: passage, translation: wlc) { |pt| pt.text = hebrew_texts[i] }
+    PassageTranslation.find_or_create_by!(passage: passage, translation: kjv) { |pt| pt.text = kjv_texts[i] }
+    PassageTranslation.find_or_create_by!(passage: passage, translation: lxx) { |pt| pt.text = lxx_texts[i] }
+
+    # All Genesis 1:1-5 attributed to Priestly source
+    PassageSourceDocument.find_or_create_by!(passage: passage, source_document: p_source)
+  end
+
+  # Lexicon entries for Genesis 1:1 (Hebrew)
+  bereshit = LexiconEntry.find_or_create_by!(strongs_number: "H7225") do |e|
+    e.lemma = "רֵאשִׁית"
+    e.language = "Hebrew"
+    e.transliteration = "reshith"
+    e.definition = "Beginning, first, chief. From rosh (head). Used to denote the start of a period or the first in rank."
+    e.morphology_label = "noun, feminine, singular, construct"
+  end
+
+  bara = LexiconEntry.find_or_create_by!(strongs_number: "H1254") do |e|
+    e.lemma = "בָּרָא"
+    e.language = "Hebrew"
+    e.transliteration = "bara"
+    e.definition = "To create, to shape, to form. Used exclusively with God as subject in the Qal stem, indicating divine creative activity."
+    e.morphology_label = "verb, Qal, perfect, 3rd person, masculine, singular"
+  end
+
+  elohim = LexiconEntry.find_or_create_by!(strongs_number: "H430") do |e|
+    e.lemma = "אֱלֹהִים"
+    e.language = "Hebrew"
+    e.transliteration = "elohim"
+    e.definition = "God, gods, divine beings. Plural form of eloah. When used with singular verbs, refers to the God of Israel."
+    e.morphology_label = "noun, masculine, plural"
+  end
+
+  # Original language tokens for Genesis 1:1
+  gen_1_1 = gen_passages[0]
+  [
+    { position: 1, text: "בְּרֵאשִׁית", transliteration: "bereshith", lemma: "רֵאשִׁית", morphology: "prep+n-fs-c", lexicon_entry: bereshit },
+    { position: 2, text: "בָּרָא", transliteration: "bara", lemma: "בָּרָא", morphology: "v-Qp3ms", lexicon_entry: bara },
+    { position: 3, text: "אֱלֹהִים", transliteration: "elohim", lemma: "אֱלֹהִים", morphology: "n-mp", lexicon_entry: elohim },
+    { position: 4, text: "אֵת", transliteration: "eth", lemma: "אֵת", morphology: "part-do" },
+    { position: 5, text: "הַשָּׁמַיִם", transliteration: "hashamayim", lemma: "שָׁמַיִם", morphology: "art+n-mp" },
+    { position: 6, text: "וְאֵת", transliteration: "ve'eth", lemma: "וְ+אֵת", morphology: "conj+part-do" },
+    { position: 7, text: "הָאָרֶץ", transliteration: "ha'arets", lemma: "אֶרֶץ", morphology: "art+n-fs" }
+  ].each do |attrs|
+    OriginalLanguageToken.find_or_create_by!(passage: gen_1_1, position: attrs[:position]) do |t|
+      t.text = attrs[:text]
+      t.transliteration = attrs[:transliteration]
+      t.lemma = attrs[:lemma]
+      t.morphology = attrs[:morphology]
+      t.lexicon_entry = attrs[:lexicon_entry]
+    end
+  end
+
+  # Textual variant example: Genesis 1:1 in Codex Sinaiticus vs Vaticanus (LXX)
+  TextualVariant.find_or_create_by!(passage: gen_1_1, manuscript: sinaiticus) do |v|
+    v.text = "ἐν ἀρχῇ ἐποίησεν ὁ θεὸς τὸν οὐρανὸν καὶ τὴν γῆν"
+    v.notes = "Sinaiticus reading of Genesis 1:1 matches the standard LXX text."
+  end
+
+  TextualVariant.find_or_create_by!(passage: gen_1_1, manuscript: vaticanus) do |v|
+    v.text = "ἐν ἀρχῇ ἐποίησεν ὁ θεὸς τὸν οὐρανὸν καὶ τὴν γῆν"
+    v.notes = "Vaticanus reading of Genesis 1:1 matches the standard LXX text. No significant variants."
+  end
+
+  # Default admin user (development convenience — never ship a known password to production)
+  User.find_or_create_by!(email: "admin@myscriptures.app") do |u|
+    u.display_name = "Admin"
+    u.password = "password"
+    u.admin = true
+  end
 end
 
 # Parallel passage: not yet seeded as we need passages from multiple corpora loaded via import
