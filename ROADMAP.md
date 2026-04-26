@@ -25,69 +25,104 @@ Design the core data model:
 
 ### 1.2 Source data
 
-Prioritise critical editions and scholarly sources over devotional translations:
+Prioritise critical editions and scholarly sources over devotional translations.
+Status legend: `[x]` imported · `[ ]` planned · `—` not applicable.
 
 **Bible**
-- [ ] OSIS or USFM XML sources (e.g. eBible.org, Crosswire)
-- [x] Translations: KJV, ASV, YLT, Darby (public domain) — all 4 imported via scrollmapper JSON (~31,100 verses each)
-- [ ] WEB (World English Bible) — not available in scrollmapper, needs alternate source
-- [ ] Critical translations: NRSV, NJPS (license permitting)
-- [x] Original languages: SBLGNT (Greek NT, 7,927 verses from MorphGNT)
-- [ ] Original languages: Westminster Leningrad Codex (Hebrew), LXX (Septuagint)
-- [x] Strongs lexicon (Hebrew & Greek) — 8,674 Hebrew + 5,523 Greek entries from OpenScriptures
-- [x] Dead Sea Scrolls (public domain transcriptions) — 266 manuscripts, 11,711 passage variants from BiblicalDSS (CC BY-NC 4.0)
-- [x] Codex Sinaiticus and Vaticanus (digitised, public domain) — Manuscript records with facsimile URLs (codexsinaiticus.org, digi.vatlib.it) plus a curated set of well-documented variants (Mark 16:9–20, John 7:53–8:11, Comma Johanneum, Mark 1:1) seeded via `rake import:manuscripts`
+
+| Source / text | Original | Transliteration | English translation |
+| --- | --- | --- | --- |
+| KJV / ASV / YLT / Darby (scrollmapper JSON, ~31,100 verses each) |  —  |  —  | [x] |
+| WEB (World English Bible)                                        |  —  |  —  | [ ] |
+| NRSV / NJPS (critical, license permitting)                       |  —  |  —  | [ ] |
+| OSIS / USFM XML pipeline (eBible.org, Crosswire)                 | [ ] |  —  |  —  |
+| SBLGNT — Greek New Testament (MorphGNT, 7,927 verses)            | [x] | [ ] |  —  |
+| Westminster Leningrad Codex (Hebrew Bible)                       | [ ] | [ ] |  —  |
+| Septuagint (LXX)                                                 | [ ] | [ ] | [ ] |
+| Strong's lexicon (8,674 Hebrew + 5,523 Greek, OpenScriptures)    | [x] | [x] | [x] glosses |
+| Dead Sea Scrolls (BiblicalDSS, 266 mss / 11,711 variants)        | [x] | [ ] | [ ] |
+| Codex Sinaiticus (manuscript record + curated variants)          | [x] |  —  |  —  |
+| Codex Vaticanus (manuscript record + curated variants)           | [x] |  —  |  —  |
 
 **Quran**
-- [x] Tanzil.net source (Arabic + translations) — Arabic, Sahih International, Yusuf Ali, Pickthall (6,236 ayahs each)
-- [x] Translations: Yusuf Ali, Pickthall, Sahih International — all three imported
-- [x] Sana'a manuscript variants (earliest extant Quran fragments) — Codex San'a 1 lower text (scriptio inferior, pre-Uthmanic) and upper text seeded as Manuscript records with facsimile_url and a sample of variants from Sadeghi & Goudarzi 2012, via `rake import:manuscripts`
 
-**Hadith**
-- [x] Hadith collections (AhmedBaset/hadith-json) — 17 collections imported: 9 major books (Bukhari, Muslim, Abu Dawud, Tirmidhi, Nasa'i, Ibn Majah, Malik, Ahmad, Darimi), 3 forty-hadith compilations (Nawawi, Qudsi, Shah Waliullah), 5 supplementary books (Al-Adab Al-Mufrad, Bulugh Al-Maram, Mishkat Al-Masabih, Riyad As-Salihin, Shamail Muhammadiyah) — ~50,884 hadiths, Arabic + English
-- [x] Sira (biography of the Prophet) — Ibn Ishaq/Ibn Hisham's Sirat Rasul Allah, Abdus-Salam M. Harun abridgement from Internet Archive DjVu text (copyright status unclear; original Arabic 9th century is public domain)
-- [x] Sira — Ibn Kathir's Al-Sira al-Nabawiyya (14th c. Arabic, public domain) imported via `rake import:ibn_kathir_sira`; Arabic only, since Trevor Le Gassick's English translation (1998–2000) is under copyright
-- [x] Tafsir (Quranic exegesis) — Ibn Kathir (English), Al-Jalalayn (English), Al-Tabari (Arabic) imported as Commentary records linked to Quran passages via spa5k/tafsir_api (27 editions available, 3 imported initially)
-- [x] Fiqh texts — OpenITI mARkdown importer (`Import::Fiqh`) handling `#`/`##`/`###` headings and `#~~` paragraph milestones; al-Shafi'i's al-Risala (c. 820 CE) wired up via `rake import:fiqh_risala` as the seed work for the Fiqh corpus
+| Source / text | Original | Transliteration | English translation |
+| --- | --- | --- | --- |
+| Quran (Tanzil.net, 6,236 ayahs)                                             | [x] | [ ] |  —  |
+| Sahih International / Yusuf Ali / Pickthall                                 |  —  |  —  | [x] |
+| Codex San'a 1 — lower (pre-Uthmanic) + upper text (Sadeghi & Goudarzi 2012) | [x] | [ ] | [ ] |
+
+**Hadith / Sira / Tafsir / Fiqh**
+
+| Source / text | Original | Transliteration | English translation |
+| --- | --- | --- | --- |
+| Hadith — 17 collections, ~50,884 hadiths (AhmedBaset/hadith-json) | [x]          |  —  | [x] |
+| Sirat Rasul Allah — Ibn Hisham / Ibn Ishaq                        | [ ]          |  —  | [x] (Harun abridgement) |
+| Al-Sira al-Nabawiyya — Ibn Kathir (14th c.)                       | [x]          |  —  | [ ] (Le Gassick under copyright) |
+| Tafsir — Ibn Kathir / Al-Jalalayn / Al-Tabari (spa5k/tafsir_api)  | [x] (Tabari) |  —  | [x] (Ibn Kathir, Jalalayn) |
+| Fiqh — al-Shafi'i's al-Risala (OpenITI mARkdown)                  | [x]          |  —  | [ ] |
 
 **Pali Canon**
-- [x] SuttaCentral data (JSON) — Dhammapada imported (423 verses, Pali + Bhikkhu Sujato English)
+
+| Source / text | Original | Transliteration | English translation |
+| --- | --- | --- | --- |
+| Dhammapada (SuttaCentral, 423 verses) | [x] (Pali in Latin script) |  —  | [x] (Bhikkhu Sujato) |
 
 **Hindu**
-- [ ] Vedas — GRETIL (Göttingen Register of Electronic Texts in Indian Languages) has critical e-texts; Sanskrit originals are public domain
-- [ ] Upanishads — GRETIL or Sacred Texts Archive (sacred-texts.com); Max Müller translations (1879–1884) are public domain
-- [ ] Bhagavad Gita — GRETIL Sanskrit text; public domain translations (Edwin Arnold 1885, Swami Vivekananda)
-- [ ] Mahabharata / Ramayana — GRETIL critical editions; Bhandarkar Oriental Research Institute critical edition of the Mahabharata
+
+| Source / text | Original | Transliteration | English translation |
+| --- | --- | --- | --- |
+| Vedas (GRETIL critical e-texts)                | [ ] | [ ] | [ ] |
+| Upanishads (GRETIL / Sacred Texts Archive)     | [ ] | [ ] | [ ] (Max Müller 1879–1884 PD) |
+| Bhagavad Gita (GRETIL)                         | [ ] | [ ] | [ ] (Arnold 1885, Vivekananda PD) |
+| Mahabharata / Ramayana (GRETIL, BORI critical) | [ ] | [ ] | [ ] |
 
 **Zoroastrian**
-- [ ] Avesta — avesta.org has Gathic hymns and Yasna texts; original Avestan is public domain
-- [ ] Sacred Books of the East translations (Max Müller, 1880s) — public domain, available via sacred-texts.com and Internet Archive
+
+| Source / text | Original | Transliteration | English translation |
+| --- | --- | --- | --- |
+| Avesta — Gathas, Yasna (avesta.org) | [ ] | [ ] | [ ] (Sacred Books of the East PD) |
 
 **Mesopotamian**
-- [x] Epic of Gilgamesh — R. Campbell Thompson literal English hexameter translation (1928), Internet Archive DjVu text (public domain)
-- [x] Enuma Elish — E.A. Wallis Budge, "The Babylonian Legends of Creation" (1921), Internet Archive DjVu text (public domain)
-- [ ] ORACC (Open Richly Annotated Cuneiform Corpus) for Akkadian/Babylonian texts
+
+| Source / text | Original | Transliteration | English translation |
+| --- | --- | --- | --- |
+| Epic of Gilgamesh (Thompson 1928, Internet Archive) | [ ] |  —  | [x] |
+| Enuma Elish (Budge 1921, Internet Archive)          | [ ] |  —  | [x] |
+| ORACC — Akkadian / Babylonian corpus                | [ ] | [ ] | [ ] |
 
 **Egyptian**
-- [ ] Book of the Dead — public domain translations (E.A. Wallis Budge 1895); TLA (Thesaurus Linguae Aegyptiae) for hieroglyphic texts
-- [ ] Pyramid Texts — Samuel Mercer translation (1952) may be public domain; BBAW digital edition
-- [ ] Coffin Texts — Adriaan de Buck critical edition; public domain translations limited
+
+| Source / text | Original | Transliteration | English translation |
+| --- | --- | --- | --- |
+| Book of the Dead (TLA hieroglyphs; Budge 1895)    | [ ] | [ ] | [ ] |
+| Pyramid Texts (BBAW digital edition; Mercer 1952) | [ ] | [ ] | [ ] |
+| Coffin Texts (de Buck critical edition)           | [ ] | [ ] | [ ] |
 
 **Greco-Roman**
-- [ ] Homeric Hymns — Perseus Digital Library (Tufts) has Greek texts and English translations; public domain
-- [ ] Orphic texts — Perseus and Thesaurus Linguae Graecae (TLG) for Greek originals
-- [ ] Hesiod (Theogony, Works and Days) — Perseus Digital Library; Hugh G. Evelyn-White translation (1914) is public domain
+
+| Source / text | Original | Transliteration | English translation |
+| --- | --- | --- | --- |
+| Homeric Hymns (Perseus Digital Library)                          | [ ] |  —  | [ ] |
+| Orphic texts (Perseus / TLG)                                     | [ ] |  —  | [ ] |
+| Hesiod — Theogony, Works and Days (Perseus; Evelyn-White 1914 PD) | [ ] |  —  | [ ] |
 
 **Norse**
-- [x] Poetic Edda — Völuspá, Hávamál, etc.; Henry Adams Bellows translation (1923) is public domain; Old Norse texts (25 poems) from CLTK/heimskringla.no (Guðni Jónsson edition)
-- [x] Prose Edda (Snorri Sturluson) — Arthur Gilchrist Brodeur translation (1916) from Internet Archive DjVu; Old Norse (4 sections) from CLTK/heimskringla.no
+
+| Source / text | Original | Transliteration | English translation |
+| --- | --- | --- | --- |
+| Poetic Edda — 25 poems (Guðni Jónsson, CLTK/heimskringla.no) | [x] |  —  | [x] (Bellows 1923) |
+| Prose Edda — 4 sections (Guðni Jónsson)                      | [x] |  —  | [x] (Brodeur 1916) |
 
 **Celtic**
-- [x] Mabinogion — Lady Charlotte Guest English translation (1849), Project Gutenberg; Rhŷs & Evans Middle Welsh from Red Book of Hergest (1887), Internet Archive
-- [x] Lebor Gabála Érenn — Old/Middle Irish text only from Macalister critical edition (1938–1956), Internet Archive DjVu; original medieval text is public domain, English translation omitted (US copyright until 2034+)
-- [x] Táin Bó Cúailnge — Joseph Dunn English translation (1914), Project Gutenberg; Strachan & O'Keeffe Old Irish from Yellow Book of Lecan (1912), Internet Archive
 
-**Other traditions**
+| Source / text | Original | Transliteration | English translation |
+| --- | --- | --- | --- |
+| Mabinogion (Rhŷs & Evans 1887, Red Book of Hergest)               | [x] |  —  | [x] (Guest 1849) |
+| Lebor Gabála Érenn (Macalister 1938–1956)                         | [x] |  —  | [ ] (US copyright until 2034+) |
+| Táin Bó Cúailnge (Strachan & O'Keeffe 1912, Yellow Book of Lecan) | [x] |  —  | [x] (Dunn 1914) |
+
+**Cross-tradition tasks**
 - [ ] Identify reliable public domain sources for each corpus listed in the README
 - [ ] Prefer critical editions with manuscript notes over popular devotional editions
 - [x] Write an importer rake task per source format — bible_json, quran_tanzil, sblgnt, strongs, suttacentral, hadith, tafsir, sira, ibn_kathir_sira, fiqh, manuscripts, mesopotamian, celtic, norse
