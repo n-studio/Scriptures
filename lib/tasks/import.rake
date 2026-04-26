@@ -19,6 +19,11 @@ namespace :import do
     ).run
   end
 
+  desc "Import the Westminster Leningrad Codex (Hebrew Bible) from scrollmapper JSON"
+  task bible_wlc: :environment do
+    RunImportJob.perform_now("bible_wlc")
+  end
+
   desc "Import Quran from Tanzil pipe-delimited text format"
   task :quran_tanzil, [ :file, :abbreviation, :name, :language ] => :environment do |_t, args|
     file = args[:file] || raise("Usage: rake import:quran_tanzil[file,abbreviation,name,language]")

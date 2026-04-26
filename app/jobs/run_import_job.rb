@@ -37,6 +37,7 @@ class RunImportJob < ApplicationJob
     when "bible_asv"     then Import::BibleJson.new(file: source("asv.json"), abbreviation: "ASV", name: "American Standard Version", language: "English", progress: cb).run
     when "bible_ylt"     then Import::BibleJson.new(file: source("ylt.json"), abbreviation: "YLT", name: "Young's Literal Translation", language: "English", progress: cb).run
     when "bible_darby"   then Import::BibleJson.new(file: source("darby.json"), abbreviation: "DBY", name: "Darby Translation", language: "English", progress: cb).run
+    when "bible_wlc"     then Import::BibleJson.new(file: source("wlc.json"), abbreviation: "WLC", name: "Westminster Leningrad Codex", language: "Hebrew", edition_type: "original", progress: cb).run
     # Quran from Tanzil pipe-delimited text format
     when "quran_arabic"  then Import::QuranTanzil.new(file: source("quran_arabic.txt"), abbreviation: "QAR", name: "Quran (Simple Arabic)", language: "Arabic", progress: cb).run
     when "quran_sahih"   then Import::QuranTanzil.new(file: source("quran_sahih.txt"), abbreviation: "SAH", name: "Sahih International", language: "English", progress: cb).run
@@ -277,6 +278,11 @@ class RunImportJob < ApplicationJob
                  name: "SBLGNT (Latin transliteration)", language: "Greek" }
     end
 
+    if (wlc = Translation.find_by(abbreviation: "WLC"))
+      pairs << { source: wlc, abbreviation: "WLC-T",
+                 name: "Westminster Leningrad Codex (Latin transliteration)", language: "Hebrew" }
+    end
+
     if (qar = Translation.find_by(abbreviation: "QAR"))
       pairs << { source: qar, abbreviation: "QAR-T",
                  name: "Quran (Latin transliteration)", language: "Arabic" }
@@ -294,7 +300,7 @@ class RunImportJob < ApplicationJob
   # Import all available source data
   def run_all
     %w[
-      bible_kjv bible_asv bible_ylt bible_darby
+      bible_kjv bible_asv bible_ylt bible_darby bible_wlc
       quran_arabic quran_sahih quran_yusufali quran_pickthall tafsir
       sblgnt suttacentral hadith sira ibn_kathir_sira fiqh_risala dead_sea_scrolls
       gilgamesh enuma_elish mesopotamian_original

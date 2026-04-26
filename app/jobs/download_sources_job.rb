@@ -20,6 +20,9 @@ class DownloadSourcesJob < ApplicationJob
     "bible_asv" => { "asv.json" => "#{SCROLLMAPPER_BASE}/ASV.json" },
     "bible_ylt" => { "ylt.json" => "#{SCROLLMAPPER_BASE}/YLT.json" },
     "bible_darby" => { "darby.json" => "#{SCROLLMAPPER_BASE}/Darby.json" },
+    # Westminster Leningrad Codex — Hebrew Bible / Tanakh, public domain consonantal
+    # text with niqud and ta'amim from the Leningrad Codex (B19A, c. 1008 CE).
+    "bible_wlc" => { "wlc.json" => "#{SCROLLMAPPER_BASE}/WLC.json" },
 
     # Tanzil.net — CC BY 3.0; Quran text is not copyrightable; translations vary by translator
     "quran_arabic" => {

@@ -11,11 +11,12 @@ module Import
       Hebrews James 1\ Peter 2\ Peter 1\ John 2\ John 3\ John Jude Revelation
     ]).freeze
 
-    def initialize(file:, abbreviation:, name:, language:, progress: nil)
+    def initialize(file:, abbreviation:, name:, language:, edition_type: nil, progress: nil)
       @file = file
       @abbreviation = abbreviation
       @name = name
       @language = language
+      @edition_type = edition_type
       @progress = progress
     end
 
@@ -26,8 +27,7 @@ module Import
       puts "Importing #{@abbreviation} (#{@name}) — #{books.size} books"
 
       ensure_traditions_and_corpora
-      translation_ot = ensure_translation(@bible_corpus)
-      translation_nt = ensure_translation(@nt_corpus)
+      translations = {}
 
       total_passages = 0
 
@@ -36,7 +36,7 @@ module Import
       books.each_with_index do |book, book_index|
         book_name = book["name"]
         corpus = nt_book?(book_name) ? @nt_corpus : @bible_corpus
-        translation = nt_book?(book_name) ? translation_nt : translation_ot
+        translation = (translations[corpus.id] ||= ensure_translation(corpus))
 
         scripture = Scripture.find_or_create_by!(corpus: corpus, slug: slugify(book_name)) do |s|
           s.name = book_name
@@ -103,6 +103,7 @@ module Import
       Translation.find_or_create_by!(abbreviation: @abbreviation, corpus: corpus) do |t|
         t.name = @name
         t.language = @language
+        t.edition_type = @edition_type if @edition_type
       end
     end
 
